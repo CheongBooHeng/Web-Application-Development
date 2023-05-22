@@ -3,7 +3,7 @@
 
 <head>
     <title>Exercise 1</title>
-    <link rel="stylesheet" type="text/css" href="random_num.css">
+    <link rel="stylesheet" type="text/css" href="css/random_num.css">
 </head>
 
 <body>
