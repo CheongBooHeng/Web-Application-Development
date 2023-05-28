@@ -16,7 +16,7 @@
     ?>
     <form>
       <div class="row">
-        <div class="col">
+        <div class="col text-info">
           <label for="day">Day</label>
           <select class="form-select" aria-label="Default select example">
             <?php
@@ -26,7 +26,7 @@
             ?>
           </select>
         </div>
-        <div class="col">
+        <div class="col text-warning">
           <label for="day">Month</label>
           <select class="form-select" aria-label="Default select example">
             <?php
@@ -36,7 +36,7 @@
             ?>
           </select>
         </div>
-        <div class="col">
+        <div class="col text-danger">
           <label for="day">Year</label>
           <select class="form-select" aria-label="Default select example">
             <?php
