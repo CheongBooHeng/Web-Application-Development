@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
     <title>W4 Question 4</title>
-  </style>
+    </style>
 </head>
 
 <body>
@@ -24,24 +24,26 @@
         <p id="result">
             <?php
             if (isset($_POST['submit'])) {
-                $number = trim($_POST['number']);
+                $number = $_POST['number'];
 
-                if (is_numeric($number)) {
+                if (empty($number)) {
+                    echo "<p class='error'>Please fill in a number.</p>";
+                } elseif (!is_numeric($number)) {
+                    echo "<p class='error'>Please enter a valid number.</p>";
+                } else {
+                    $number = (int)$number;
                     $sum = 0;
+
                     for ($i = intval($number); $i >= 1; $i--) {
                         $sum += $i;
                     }
 
-                    echo $number . "+";
-                    for ($i = intval($number) - 1; $i >= 1; $i--) {
-                        echo $i . "+";
-                    }
-                    echo "1 = " . $sum;
-                } else {
-                    echo '<span class="text-danger">Please fill in a number.</span>';
+                    echo "<h3>Sum:</h3>";
+                    echo implode('+', range($number, 1)) . ' = ' . $sum;
                 }
             }
             ?>
+
         </p>
     </div>
 </body>
