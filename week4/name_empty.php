@@ -30,11 +30,11 @@
             $lastName = $_POST['lastName'];
 
             if (empty($firstName) || empty($lastName)) {
-                echo '<div class = "alert alert-danger role="alert">' . "Please enter your name." . '</div>';
+                echo '<span class="text-danger">' . "Please enter your name." . '</div>';
             } else {
                 $formattedFirstName = ucwords(strtolower($firstName));
                 $formattedLastName = ucwords(strtolower($lastName));
-                echo '<div class = "alert alert-success role="alert">' . "Name: " . $formattedLastName . " " . $formattedFirstName . '</div>';
+                echo "Name: " . $formattedLastName . " " . $formattedFirstName;
             }
         }
         ?>

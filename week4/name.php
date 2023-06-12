@@ -30,7 +30,7 @@
             $lastName = $_POST['lastName'];
             $formattedFirstName = ucwords(strtolower($firstName));
             $formattedLastName = ucwords(strtolower($lastName));
-            echo '<div class = "alert alert-success role="alert">' . "Name: " . $formattedLastName . " " . $formattedFirstName . '</div>';
+            echo "Name: " . $formattedLastName . " " . $formattedFirstName;
         }
         ?>
     </div>
