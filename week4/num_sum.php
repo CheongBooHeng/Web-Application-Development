@@ -27,8 +27,8 @@
         <p id="result">
             <?php
             if (isset($_POST['submit'])) {
-                $firstNumber = trim($_POST['firstNumber']);
-                $secondNumber = trim($_POST['secondNumber']);
+                $firstNumber = ($_POST['firstNumber']);
+                $secondNumber = ($_POST['secondNumber']);
 
                 if (is_numeric($firstNumber) && is_numeric($secondNumber)) {
                     $sum = floatval($firstNumber) + floatval($secondNumber);

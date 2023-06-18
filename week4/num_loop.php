@@ -26,9 +26,7 @@
             if (isset($_POST['submit'])) {
                 $number = $_POST['number'];
 
-                if (empty($number)) {
-                    echo "<p class='text-danger'>Please fill in a number.</p>";
-                } elseif (!is_numeric($number)) {
+                if (!is_numeric($number)) {
                     echo "<p class='text-danger'>Please enter a valid number.</p>";
                 } else {
                     $number = (int)$number;
