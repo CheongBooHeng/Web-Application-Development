@@ -31,8 +31,9 @@
                     <select class="form-select" name="month" required>
                         <?php
                         $months = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
-                        foreach ($months as $month) {
-                            echo "<option value=\"$month\">$month</option>";
+                        foreach ($months as $x => $month) {
+                            $y = $x + 1;
+                            echo "<option value=\"$y\">$month</option>";
                         }
                         ?>
                     </select>
@@ -55,9 +56,9 @@
         <?php
         if (isset($_POST['submit'])) {
             $day = $_POST['day'];
-            $month = $_POST['month'];
+            $months = $_POST['month'];
             $year = $_POST['year'];
-            if (!checkdate(array_search($month, $months) + 1, $day, $year)) {
+            if (!checkdate($months, $day, $year)) {
                 echo "Invalid date!";
                 return;
             }
@@ -66,41 +67,39 @@
             $zodiacs = array('Rat', 'Cow', 'Tiger', 'Rabbit', 'Dragon', 'Snake', 'Horse', 'Goat', 'Monkey', 'Rooster', 'Dog', 'Pig');
             $count = ($year - 1900) % 12;
             $zodiac = $zodiacs[$count];
-            $months = array_search($month, $months) + 1;
 
-            $zodiacsign = " ";
+            $constellation = " ";
             if (($months == 1 && $day > 19) || ($months == 2 && $day < 19)) {
-                $zodiacsign = "Aquarius";
+                $constellation = "Aquarius";
             } elseif (($months == 2 && $day > 18) || ($months == 3 && $day < 21)) {
-                $zodiacsign = "Pisces";
+                $constellation = "Pisces";
             } elseif (($months == 3 && $day > 20) || ($months == 4 && $day < 20)) {
-                $zodiacsign = "Aries";
+                $constellation = "Aries";
             } elseif (($months == 4 && $day > 19) || ($months == 5 && $day < 21)) {
-                $zodiacsign = "Taurus";
+                $constellation = "Taurus";
             } elseif (($months == 5 && $day > 20) || ($months == 6 && $day < 21)) {
-                $zodiacsign = "Gemini";
+                $constellation = "Gemini";
             } elseif (($months == 6 && $day > 20) || ($months == 7 && $day < 23)) {
-                $zodiacsign = "Cancer";
+                $constellation = "Cancer";
             } elseif (($months == 7 && $day > 22) || ($months == 8 && $day < 23)) {
-                $zodiacsign = "Leo";
+                $constellation = "Leo";
             } elseif (($months == 8 && $day > 22) || ($months == 9 && $day < 23)) {
-                $zodiacsign = "Virgo";
+                $constellation = "Virgo";
             } elseif (($months == 9 && $day > 22) || ($months == 10 && $day < 23)) {
-                $zodiacsign = "Libra";
+                $constellation = "Libra";
             } elseif (($months == 10 && $day > 22) || ($months == 11 && $day < 22)) {
-                $zodiacsign = "Scorpio";
+                $constellation = "Scorpio";
             } elseif (($months == 11 && $day > 21) || ($months == 12 && $day < 22)) {
-                $zodiacsign = "Sagittarius";
+                $constellation = "Sagittarius";
             } elseif (($months == 12 && $day > 21) || ($months == 1 && $day < 20)) {
-                $zodiacsign = "Capricorn";
+                $constellation = "Capricorn";
             }
 
-            echo "Date of Birth: " . $day . " " . $month . " " . $year;
-            echo "<br>Your Chinese zodiac sign is: $zodiac";
-            echo "<br>Your Western zodiac sign is: $zodiacsign";
+            echo "Date of Birth: " . $day . " " . $months . " " . $year;
+            echo "<br>Your chinese zodiac sign is: $zodiac";
+            echo "<br>Your constellation is: $constellation";
         }
         ?>
     </div>
 </body>
-
 </html>
