@@ -39,6 +39,7 @@
           <select class="form-select" name="month" required>
             <?php
             $months = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+            //months是月份的盒子
             foreach ($months as $month) {
               echo "<option value=\"$month\">$month</option>";
             }
@@ -79,6 +80,7 @@
       echo "<br>Date of Birth: " . $day . " " . $months . " " . $year;
       $currentYear = date('Y');
       $age = $currentYear - $year;
+      //帮你算出来朋友还有几天生日
       $birthdate = strtotime("$year-$months-$day");
       $age = date('Y') - date('Y', $birthdate);
       if (date('md') < date('md', $birthdate)) {
