@@ -19,6 +19,7 @@
         <!-- html form to create product will be here -->
         <!-- PHP insert code will be here -->
         <?php
+        date_default_timezone_set('asia/Kuala_Lumpur');
         if ($_POST) {
             // include database connection
             include 'config/database.php';
@@ -46,25 +47,29 @@
                 }
 
                 if (empty($price)) {
-                    $error[] = 'Product price is required';
-                } elseif (!is_numeric($_POST['price'])) {
+                    $errors[] = "Price is required.";
+                } elseif (!is_numeric($price)) {
                     $errors[] = "Product price must be a numeric value.";
-                } else {
-                    $price = $_POST['price'];
-                }
-                if(empty($manufacture) || empty($expired)){
-                    $error[] = 'Manufacture date and expired date is required.';
                 }
 
-
-                if ($promotion >= $price) {
+                if (empty($promotion)) {
+                    $errors[] = 'Promotion price is required.';
+                } elseif ($promotion >= $price) {
                     $errors[] = 'Promotion price must be cheaper than original price.';
                 } 
-                if ($expired <= $manufacture) {
+
+                if (empty($manufacture)) {
+                    $errors[] = 'Manufacture date is required.';
+                } elseif ($expired <= $manufacture) {
                     $errors[] = 'Expired date must be later than manufacture date.';
-                } 
+                }
+
+                if (empty($expired)) {
+                    $errors[] = "Expired date is required.";
+                }
+                
                 if (!empty($errors)) {
-                    echo "<div class='alert alert-danger m-3'>";
+                    echo "<div class='alert alert-danger'>";
                     foreach ($errors as $displayError) {
                         echo $displayError . "<br>";
                     }
@@ -84,6 +89,7 @@
                     // Execute the query
                     if ($stmt->execute()) {
                         echo "<div class='alert alert-success'>Record was saved.</div>";
+                        $_POST = array();
                     } else {
                         echo "<div class='alert alert-danger'>Unable to save record.</div>";
                     }
@@ -102,28 +108,28 @@
             <table class='table table-hover table-responsive table-bordered'>
                 <tr>
                     <td>Name</td>
-                    <td><input type='text' name='name' class='form-control' value="<?php echo isset($_POST['name']) ? $_POST['name'] : ''; ?>"/></td>
+                    <td><input type='text' name='name' class='form-control' value="<?php echo isset($_POST['name']) ? $_POST['name'] : ''; ?>" /></td>
                 </tr>
                 <tr>
                     <td>Description</td>
-                    <td><textarea class="form-control" name="description" id="floatingTextarea" ><?php echo isset($_POST['description']) ? $_POST['description'] : ''; ?></textarea>
+                    <td><textarea class="form-control" name="description" id="floatingTextarea"><?php echo isset($_POST['description']) ? $_POST['description'] : ''; ?></textarea>
                     </td>
                 </tr>
                 <tr>
                     <td>Price</td>
-                    <td><input type='text' name='price' class='form-control' value="<?php echo isset($_POST['price']) ? $_POST['price'] : ''; ?>"/></td>
+                    <td><input type='text' name='price' class='form-control' value="<?php echo isset($_POST['price']) ? $_POST['price'] : ''; ?>" /></td>
                 </tr>
                 <tr>
                     <td>Promotion Price</td>
-                    <td><input type='text' name='promotion' class='form-control' value="<?php echo isset($_POST['promotion']) ? $_POST['promotion'] : ''; ?>"/></td>
+                    <td><input type='text' name='promotion' class='form-control' value="<?php echo isset($_POST['promotion']) ? $_POST['promotion'] : ''; ?>" /></td>
                 </tr>
                 <tr>
                     <td>Manufacture Date</td>
-                    <td><input type='date' name='manufacture' class='form-control' value="<?php echo isset($_POST['manufacture']) ? $_POST['manufacture'] : ''; ?>"/></td>
+                    <td><input type='date' name='manufacture' class='form-control' value="<?php echo isset($_POST['manufacture']) ? $_POST['manufacture'] : ''; ?>" /></td>
                 </tr>
                 <tr>
                     <td>Expired</td>
-                    <td><input type='date' name='expired' class='form-control' value="<?php echo isset($_POST['expired']) ? $_POST['expired'] : ''; ?>"/></td>
+                    <td><input type='date' name='expired' class='form-control' value="<?php echo isset($_POST['expired']) ? $_POST['expired'] : ''; ?>" /></td>
                 </tr>
                 <tr>
                     <td></td>
