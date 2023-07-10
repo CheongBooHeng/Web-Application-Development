@@ -26,16 +26,19 @@
             try {
                 // insert query
                 $query = "INSERT INTO customers SET username=:username, password=:password, firstname=:firstname, lastname=:lastname, 
-                gender=:gender, date_of_birth=:date_of_birth, registration_date_time=:registration_date_time, account_status=:account_status";
+                gender=:gender, date_of_birth=:date_of_birth, registration_date_time=:registration_date_time, account_status=:account_status, email=:email";
                 // prepare query for execution
                 $stmt = $con->prepare($query);
                 $username = $_POST['username'];
                 $password = $_POST['password'];
+                $confirmpassword = $_POST['confirmpassword'];
                 $firstname = $_POST['firstname'];
                 $lastname = $_POST['lastname'];
+                $email = $_POST['email'];
                 $gender = $_POST['gender'];
                 $date_of_birth = $_POST['date_of_birth'];
                 $account_status = $_POST['account_status'];
+
 
                 $errors = array();
                 if (empty($username)) {
@@ -48,11 +51,21 @@
                 } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?!.*[-+$()%@#]).{6,}$/', $password)) {
                     $errors[] = 'Invalid password format.';
                 }
+                if (empty($confirmpassword)) {
+                    $errors[] = 'Confirm password is required.';
+                } elseif ($password !== $confirmpassword) {
+                    $errors[] = 'Confirm password do not match.';
+                }
                 if (empty($firstname)) {
                     $errors[] = 'Fistname is required.';
                 }
                 if (empty($lastname)) {
                     $errors[] = 'Lastname is required.';
+                }
+                if (empty($email)) {
+                    $errors[] = 'Email is required.';
+                } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = 'Invalid email format.';
                 }
                 if (empty($gender)) {
                     $errors[] = 'Gender is required.';
@@ -63,9 +76,10 @@
                 if (empty($account_status)) {
                     $errors[] = 'Account status is required.';
                 }
+
                 // bind the parameters
                 if (!empty($errors)) {
-                    echo "<div class='alert alert-danger m-3'>";
+                    echo "<div class='alert alert-danger'>";
                     foreach ($errors as $displayError) {
                         echo $displayError . "<br>";
                     }
@@ -75,6 +89,7 @@
                     $stmt->bindParam(':password', $password);
                     $stmt->bindParam(':firstname', $firstname);
                     $stmt->bindParam(':lastname', $lastname);
+                    $stmt->bindParam(':email', $email);
                     $stmt->bindParam(':gender', $gender);
                     $registration_date_time = date('Y-m-d H:i:s'); // get the current date and time
                     $stmt->bindParam(':registration_date_time', $registration_date_time);
@@ -93,7 +108,12 @@
 
             // show error
             catch (PDOException $exception) {
-                die('ERROR: ' . $exception->getMessage());
+                //  die('ERROR: ' . $exception->getMessage());
+                if ($exception->getCode() == 23000) {
+                    echo '<div class= "alert alert-danger role=alert">' . 'Username has been taken' . '</div>';
+                } else {
+                    echo '<div class= "alert alert-danger role=alert">' . $exception->getMessage() . '</div>';
+                }
             }
         }
         ?>
@@ -112,6 +132,10 @@
                         At least 6 characters long and contain at least one uppercase letter, one lowercase letter, and one number. No special symbols allowed.</td>
                 </tr>
                 <tr>
+                    <td>Confirm password</td>
+                    <td><input type='password' name='confirmpassword' class='form-control' ; ?></td>
+                </tr>
+                <tr>
                     <td>First Name</td>
                     <td><input type='text' name='firstname' class='form-control' value="<?php echo isset($_POST['firstname']) ? $_POST['firstname'] : ''; ?>" /></td>
                 </tr>
@@ -120,14 +144,16 @@
                     <td><input type='text' name='lastname' class='form-control' value="<?php echo isset($_POST['lastname']) ? $_POST['lastname'] : ''; ?>" /></td>
                 </tr>
                 <tr>
+                    <td>Email</td>
+                    <td><input type="email" class="form-control" id="email" name="email" value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>"></td>
+                </tr>
+                <tr>
                     <td>Gender</td>
                     <td>
-                        <input type="radio" name="gender" id="genderMale" value="male" required>
+                        <input type="radio" name="gender" id="genderMale" value="male" checked>
                         <label class="form-check-label" for="genderMale">Male</label>
-                        <input type="radio" name="gender" id="genderFemale" value="female" required>
+                        <input type="radio" name="gender" id="genderFemale" value="female">
                         <label class="form-check-label" for="genderFemale">Female</label>
-                        <input type="radio" name="gender" id="genderOther" value="other" required>
-                        <label class="form-check-label" for="genderOther">Other</label>
                     </td>
                 </tr>
                 <tr>
@@ -136,9 +162,9 @@
                 </tr>
                 <tr>
                     <td>Account Status</td>
-                    <td><input type="radio" name="account_status" id="active" value="active" required>
+                    <td><input type="radio" name="account_status" id="active" value="active" checked>
                         <label class="form-check-label" for="active">Active</label>
-                        <input type="radio" name="account_status" id="inactive" value="inactive" required>
+                        <input type="radio" name="account_status" id="inactive" value="inactive">
                         <label class="form-check-label" for="inactive">Inactive</label>
                     </td>
                 </tr>
