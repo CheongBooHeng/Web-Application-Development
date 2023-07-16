@@ -48,7 +48,7 @@
         $num = $stmt->rowCount();
 
         // link to create record form
-        echo "<a href='create.php' class='btn btn-primary mb-3'>Create New Customers</a>";
+        echo "<a href='create_customer.php' class='btn btn-primary mb-3'>Create New Customers</a>";
 
         //check if more than 0 record found
         if ($num > 0) {
