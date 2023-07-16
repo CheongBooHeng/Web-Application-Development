@@ -38,6 +38,7 @@
                 $gender = $_POST['gender'];
                 $date_of_birth = $_POST['date_of_birth'];
                 $account_status = $_POST['account_status'];
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
 
                 $errors = array();
@@ -86,7 +87,7 @@
                     echo "</div>";
                 } else {
                     $stmt->bindParam(':username', $username);
-                    $stmt->bindParam(':password', $password);
+                    $stmt->bindParam(':password', $hashed_password);
                     $stmt->bindParam(':firstname', $firstname);
                     $stmt->bindParam(':lastname', $lastname);
                     $stmt->bindParam(':email', $email);
