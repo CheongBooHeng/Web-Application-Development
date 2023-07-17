@@ -31,7 +31,7 @@
 
         // select all data
         $search = isset($_GET['search']) ? $_GET['search'] : '';
-        $query = "SELECT id, name, description, price, promotion_price FROM products";
+        $query = "SELECT id, name, description, price, promotion_price, category_name FROM products";
         if (!empty($search)) {
             $query .= " WHERE name LIKE :keyword";
             $search = "%{$search}%";
@@ -62,6 +62,7 @@
             echo "<th>Name</th>";
             echo "<th>Description</th>";
             echo "<th>Price</th>";
+            echo "<th>Category</th>";
             echo "<th>Action</th>";
             echo "</tr>";
 
@@ -86,6 +87,7 @@
                     echo number_format($price, 2);
                 }
                 echo "</td>";
+                echo "<td>{$category_name}</td>";
                 echo "<td>";
                 // read one record
                 echo "<a href='product_read_one.php?id={$id}' class='btn btn-info me-3'>Read</a>";
