@@ -20,13 +20,13 @@
         <!-- PHP insert code will be here -->
         <?php
         date_default_timezone_set('asia/Kuala_Lumpur');
+        // include database connection
+        include 'config/database.php';
         if ($_POST) {
-            // include database connection
-            include 'config/database.php';
             try {
                 // insert query
                 $query = "INSERT INTO products SET name=:name, description=:description, price=:price, created=:created, 
-                promotion_price=:promotion, manufacture_date=:manufacture, expired_date=:expired";
+                promotion_price=:promotion, manufacture_date=:manufacture, expired_date=:expired, category_name=:category_name";
                 // prepare query for execution
                 $stmt = $con->prepare($query);
                 $name = $_POST['name'];
@@ -35,7 +35,7 @@
                 $promotion = $_POST['promotion'];
                 $manufacture = $_POST['manufacture'];
                 $expired = $_POST['expired'];
-                // $pattern = "/^\d+(\.\d{1,2})?$/";
+                $category_name = $_POST['category_name'];
 
                 $errors = array();
                 if (empty($name)) {
@@ -56,7 +56,7 @@
                     $errors[] = 'Promotion price is required.';
                 } elseif ($promotion >= $price) {
                     $errors[] = 'Promotion price must be cheaper than original price.';
-                } 
+                }
 
                 if (empty($manufacture)) {
                     $errors[] = 'Manufacture date is required.';
@@ -67,7 +67,7 @@
                 if (empty($expired)) {
                     $errors[] = "Expired date is required.";
                 }
-                
+
                 if (!empty($errors)) {
                     echo "<div class='alert alert-danger'>";
                     foreach ($errors as $displayError) {
@@ -85,6 +85,7 @@
                     $stmt->bindParam(':promotion', $promotion);
                     $stmt->bindParam(':manufacture', $manufacture);
                     $stmt->bindParam(':expired', $expired);
+                    $stmt->bindParam(':category_name', $category_name);
 
                     // Execute the query
                     if ($stmt->execute()) {
@@ -122,6 +123,21 @@
                 <tr>
                     <td>Promotion Price</td>
                     <td><input type='text' name='promotion' class='form-control' value="<?php echo isset($_POST['promotion']) ? $_POST['promotion'] : ''; ?>" /></td>
+                </tr>
+                <tr>
+                    <td>Categories</td>
+                    <td><select class="form-select" name="category_name"><?php
+                            // Fetch categories from the database
+                            $query = "SELECT category_name FROM categories";
+                            $stmt = $con->prepare($query);
+                            $stmt->execute();
+                            $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                            // Generate select options
+                            foreach ($categories as $category) {
+                                echo "<option value='$category'>$category</option>";
+                            } ?></select>
+                    </td>
                 </tr>
                 <tr>
                     <td>Manufacture Date</td>

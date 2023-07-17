@@ -30,7 +30,7 @@
         // read current record's data
         try {
             // prepare select query
-            $query = "SELECT id, name, description, price,promotion_price, manufacture_date,expired_date FROM products WHERE id = :id ";
+            $query = "SELECT id, name, description, price,promotion_price,category_name=:category_name, manufacture_date,expired_date FROM products WHERE id = :id ";
             $stmt = $con->prepare($query);
 
             // Bind the parameter

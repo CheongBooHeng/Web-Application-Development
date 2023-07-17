@@ -25,6 +25,7 @@
             include 'config/database.php';
             try {
                 // insert query
+                // 准备 然后send去execution
                 $query = "INSERT INTO customers SET username=:username, password=:password, firstname=:firstname, lastname=:lastname, 
                 gender=:gender, date_of_birth=:date_of_birth, registration_date_time=:registration_date_time, account_status=:account_status, email=:email";
                 // prepare query for execution

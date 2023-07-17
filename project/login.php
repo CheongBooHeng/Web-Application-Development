@@ -17,6 +17,7 @@
         <?php
         include 'config/database.php';
 
+        
         if ($_POST) {
             $username_email = $_POST['username_email'];
             $password = $_POST['password'];
@@ -41,6 +42,8 @@
                     $stmt = $con->prepare($query);
                     $stmt->bindParam(':username_email', $username_email);
                     $stmt->execute();
+                    // $row 是array
+                    //fetch 全部带进去
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                     if ($row) {
                         if (password_verify($password, $row['password'])) {
