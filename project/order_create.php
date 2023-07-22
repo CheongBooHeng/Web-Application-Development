@@ -21,33 +21,61 @@
         date_default_timezone_set('asia/Kuala_Lumpur');
         // include database connection
         include 'config/database.php';
+        $product_query = "SELECT id, name FROM products";
+        $product_stmt = $con->prepare($product_query);
+        $product_stmt->execute();
+        $product = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($_POST) {
+            try {
+                $customer = $_POST['customer'];
+                $order_date = date('Y-m-d H:i:s'); // get the current date and time
+                $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
+                $summary_stmt = $con->prepare($summary_query);
+                $summary_stmt->bindParam(':customer', $customer);
+                $order_summary_stmt->bindParam(':order_date', $order_date);
+                $summary_stmt->execute();
+
+
+                $order_id = $con->lastInsertId();
+                // order detail
+                $product_id = $_POST['product'];
+                $quantity = $_POST['quantity'];
+                $details_query = "INSERT INTO order_details SET order_id=:order_id, product_id=:product_id, quantity=:quantity";
+                $details_stmt = $con->prepare($order_details_query);
+                $details_stmt->bindParam(':order_id', $order_id);
+                $details_stmt->bindParam(':product_id', $product_id);
+                $details_stmt->bindParam(':quantity', $quantity);
+                $details_stmt->execute();
+
+                echo "<div class='alert alert-success'>Order placed successfully.</div>";
+            } catch (PDOException $exception) {
+                echo "<div class='alert alert-danger'>Unable to place the order.</div>";
+            }
+        }
         ?>
 
-        <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="GET">
-            <tr>
-                <td>Select customer</td>
-                <td><select class="form-select mb-3" name="customers">
-                        <?php
-                        // Fetch categories from the database
-                        $query = "SELECT username FROM customers";
-                        $stmt = $con->prepare($query);
-                        $stmt->execute();
-                        $customers = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        <form action="" method="POST">
+            <span>Select customer</span>
+            <select class="form-select mb-3" name="customer">
+                <?php
+                // Fetch categories from the database
+                $query = "SELECT id, username FROM customers";
+                $stmt = $con->prepare($query);
+                $stmt->execute();
+                $customers = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-                        // Generate select options
-                        foreach ($customers as $customer) {
-                            echo "<option value='$customer'>$customer</option>";
-                        } ?></select>
-                </td>
-            </tr>
-        </form>
+                // Generate select options
+                foreach ($customers as $customer) {
+                    echo "<option value='$customer'>$customer</option>";
+                } ?>
+            </select>
 
-        <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="POST">
+
             <table class='table table-hover table-responsive table-bordered'>
                 <tr>
                     <th>Product</th>
                     <th>Quantity</th>
-                    <th>Price</th>
                 </tr>
                 <tr>
                     <td><select class="form-select" name="product">
@@ -63,13 +91,9 @@
                                 echo "<option value='$product'>$product</option>";
                             } ?>
                         </select>
-                    <td><input class="form-control" type="number" name="quantity" ></td>
+                    <td><input class="form-control" type="number" name="quantity"></td>
                     </td>
-                    <td>
-                        <?php
-                        
-                        ?>
-                    </td>
+
                 </tr>
                 <tr>
                     <td><select class="form-select" name="product">
@@ -85,13 +109,9 @@
                                 echo "<option value='$product'>$product</option>";
                             } ?>
                         </select>
-                    <td><input class="form-control" type="number" name="quantity" ></td>
+                    <td><input class="form-control" type="number" name="quantity"></td>
                     </td>
-                    <td>
-                        <?php
-                        
-                        ?>
-                    </td>
+
                 </tr>
                 <tr>
                     <td><select class="form-select" name="product">
@@ -107,18 +127,12 @@
                                 echo "<option value='$product'>$product</option>";
                             } ?>
                         </select>
-                    <td><input class="form-control" type="number" name="quantity" ></td>
-                    </td>
-                    <td>
-                        <?php
-                        
-                        ?>
+                    <td><input class="form-control" type="number" name="quantity"></td>
                     </td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td class="text-end fw-bold">Subtotal</td>
-                    <td></td>
+                    <td><input type='submit' value='Place Order' class='btn btn-primary' /></td>
                 </tr>
             </table>
         </form>
