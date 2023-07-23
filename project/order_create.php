@@ -24,26 +24,26 @@
         $product_query = "SELECT id, name FROM products";
         $product_stmt = $con->prepare($product_query);
         $product_stmt->execute();
-        $product = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
+        $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($_POST) {
             try {
+                $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
                 $customer = $_POST['customer'];
                 $order_date = date('Y-m-d H:i:s'); // get the current date and time
-                $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
                 $summary_stmt = $con->prepare($summary_query);
                 $summary_stmt->bindParam(':customer', $customer);
                 $summary_stmt->bindParam(':order_date', $order_date);
                 $summary_stmt->execute();
 
-
+                // order details
+                $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
                 $order_id = $con->lastInsertId();
-                // order detail
                 $product_id = $_POST['product'];
                 $quantity = $_POST['quantity'];
-                $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
                 $details_stmt = $con->prepare($details_query);
-                for ($i = 0; $i<3; $i++) {
+                $errors = array();
+                for ($i = 0; $i < 3; $i++) {
                     $details_stmt->bindParam(':order_id', $order_id);
                     $details_stmt->bindParam(':customer_id', $customer);
                     $details_stmt->bindParam(':product_id', $product_id[$i]);
@@ -69,12 +69,9 @@
 
                 // Generate select options
                 foreach ($customers as $customer) {
-                    $customer_id = $customer['id'];
-                    $customer_name = $customer['username'];
-                    echo "<option value='$customer_id'>$customer_name</option>";
+                    echo "<option value='{$customer['id']}'>{$customer['username']}</option>";
                 } ?>
             </select>
-
 
             <table class='table table-hover table-responsive table-bordered'>
                 <tr>
@@ -82,19 +79,23 @@
                     <th>Quantity</th>
                 </tr>
                 <tr>
-                    <td><select class="form-select" name="product[]">
+                    <td><select class="form-select" name="product[]"> <!-- array -->
                             <?php
-                            // Fetch products from the database
-                            $query = "SELECT id, name FROM products";
-                            $stmt = $con->prepare($query);
-                            $stmt->execute();
-                            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
                             // Generate select options
                             foreach ($products as $product) {
-                                $product_id = $product['id'];
-                                $product_name = $product['name'];
-                                echo "<option value='$product_id'>$product_name</option>";
+                                echo "<option value='{$product['id']}'>{$product['name']}</option>";
+                            } ?>
+                        </select>
+                    <td><input class="form-control" type="number" name="quantity[]"></td> <!-- []array -->
+                    </td>
+
+                </tr>
+                <tr>
+                    <td><select class="form-select" name="product[]">
+                            <?php
+                            // Generate select options
+                            foreach ($products as $product) {
+                                echo "<option value='{$product['id']}'>{$product['name']}</option>";
                             } ?>
                         </select>
                     <td><input class="form-control" type="number" name="quantity[]"></td>
@@ -104,38 +105,10 @@
                 <tr>
                     <td><select class="form-select" name="product[]">
                             <?php
-                            // Fetch products from the database
-                            $query = "SELECT id, name FROM products";
-                            $stmt = $con->prepare($query);
-                            $stmt->execute();
-                            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
                             // Generate select options
                             foreach ($products as $product) {
-                                $product_id = $product['id'];
-                                $product_name = $product['name'];
-                                echo "<option value='$product_id'>$product_name</option>";
-                            }  ?>
-                        </select>
-                    <td><input class="form-control" type="number" name="quantity[]"></td>
-                    </td>
-
-                </tr>
-                <tr>
-                    <td><select class="form-select" name="product[]">
-                            <?php
-                            // Fetch products from the database
-                            $query = "SELECT id, name FROM products";
-                            $stmt = $con->prepare($query);
-                            $stmt->execute();
-                            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                            // Generate select options
-                            foreach ($products as $product) {
-                                $product_id = $product['id'];
-                                $product_name = $product['name'];
-                                echo "<option value='$product_id'>$product_name</option>";
-                            }  ?>
+                                echo "<option value='{$product['id']}'>{$product['name']}</option>";
+                            } ?>
                         </select>
                     <td><input class="form-control" type="number" name="quantity[]"></td>
                     </td>
