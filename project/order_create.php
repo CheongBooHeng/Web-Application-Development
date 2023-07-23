@@ -28,29 +28,62 @@
 
         if ($_POST) {
             try {
-                $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
-                $customer = $_POST['customer'];
-                $order_date = date('Y-m-d H:i:s'); // get the current date and time
-                $summary_stmt = $con->prepare($summary_query);
-                $summary_stmt->bindParam(':customer', $customer);
-                $summary_stmt->bindParam(':order_date', $order_date);
-                $summary_stmt->execute();
-
-                // order details
-                $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
-                $order_id = $con->lastInsertId();
-                $product_id = $_POST['product'];
-                $quantity = $_POST['quantity'];
-                $details_stmt = $con->prepare($details_query);
                 $errors = array();
-                for ($i = 0; $i < 3; $i++) {
-                    $details_stmt->bindParam(':order_id', $order_id);
-                    $details_stmt->bindParam(':customer_id', $customer);
-                    $details_stmt->bindParam(':product_id', $product_id[$i]);
-                    $details_stmt->bindParam(':quantity', $quantity[$i]);
-                    $details_stmt->execute();
+
+                //     if (empty($quantity)) {
+                //         $errors[] = "Please fill in the quantity for product ";
+                //     } else if ($quantity == 0) {
+                //         $errors[] = "Quantity Can not be zero.";
+                //     }
+
+                // if (!empty($errors)) {
+                //     echo "<div class='alert alert-danger'>";
+                //     foreach ($errors as $displayError) {
+                //         echo $displayError . "<br>";
+                //     }
+                //     echo "</div>";
+                // } else {
+
+                $quantity_array = $_POST['quantity'];
+                foreach ($quantity_array as $quantity) {
+                    if (empty($quantity)) {
+                        $errors[] = "Please fill in the quantity for all products.";
+                    }
+                    if ($quantity == 0) {
+                        $errors[] = "Quantity cannot be zero.";
+                    }
                 }
-                echo "<div class='alert alert-success'>Order successfully.</div>";
+
+                if (!empty($errors)) {
+                    echo "<div class='alert alert-danger'>";
+                    foreach ($errors as $displayError) {
+                        echo $displayError . "<br>";
+                    }
+                    echo "</div>";
+                } else {
+                    $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
+                    $customer = $_POST['customer'];
+                    $order_date = date('Y-m-d H:i:s'); // get the current date and time
+                    $summary_stmt = $con->prepare($summary_query);
+                    $summary_stmt->bindParam(':customer', $customer);
+                    $summary_stmt->bindParam(':order_date', $order_date);
+                    $summary_stmt->execute();
+
+                    // order details
+                    $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
+                    $order_id = $con->lastInsertId();
+                    $details_stmt = $con->prepare($details_query);
+                    for ($i = 0; $i < 3; $i++) {
+                        $product_id = $_POST['product'];
+                        $quantity = $_POST['quantity'];
+                        $details_stmt->bindParam(':order_id', $order_id);
+                        $details_stmt->bindParam(':customer_id', $customer);
+                        $details_stmt->bindParam(':product_id', $product_id[$i]);
+                        $details_stmt->bindParam(':quantity', $quantity[$i]);
+                        $details_stmt->execute();
+                    }
+                    echo "<div class='alert alert-success'>Order successfully.</div>";
+                }
             } catch (PDOException $exception) {
                 echo "<div class='alert alert-danger'>Unable to place order.</div>";
             }
