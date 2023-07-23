@@ -33,7 +33,7 @@
                 $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
                 $summary_stmt = $con->prepare($summary_query);
                 $summary_stmt->bindParam(':customer', $customer);
-                $order_summary_stmt->bindParam(':order_date', $order_date);
+                $summary_stmt->bindParam(':order_date', $order_date);
                 $summary_stmt->execute();
 
 
@@ -41,16 +41,18 @@
                 // order detail
                 $product_id = $_POST['product'];
                 $quantity = $_POST['quantity'];
-                $details_query = "INSERT INTO order_details SET order_id=:order_id, product_id=:product_id, quantity=:quantity";
-                $details_stmt = $con->prepare($order_details_query);
-                $details_stmt->bindParam(':order_id', $order_id);
-                $details_stmt->bindParam(':product_id', $product_id);
-                $details_stmt->bindParam(':quantity', $quantity);
-                $details_stmt->execute();
-
-                echo "<div class='alert alert-success'>Order placed successfully.</div>";
+                $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
+                $details_stmt = $con->prepare($details_query);
+                for ($i = 0; $i<3; $i++) {
+                    $details_stmt->bindParam(':order_id', $order_id);
+                    $details_stmt->bindParam(':customer_id', $customer);
+                    $details_stmt->bindParam(':product_id', $product_id[$i]);
+                    $details_stmt->bindParam(':quantity', $quantity[$i]);
+                    $details_stmt->execute();
+                }
+                echo "<div class='alert alert-success'>Order successfully.</div>";
             } catch (PDOException $exception) {
-                echo "<div class='alert alert-danger'>Unable to place the order.</div>";
+                echo "<div class='alert alert-danger'>Unable to place order.</div>";
             }
         }
         ?>
@@ -63,11 +65,13 @@
                 $query = "SELECT id, username FROM customers";
                 $stmt = $con->prepare($query);
                 $stmt->execute();
-                $customers = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Generate select options
                 foreach ($customers as $customer) {
-                    echo "<option value='$customer'>$customer</option>";
+                    $customer_id = $customer['id'];
+                    $customer_name = $customer['username'];
+                    echo "<option value='$customer_id'>$customer_name</option>";
                 } ?>
             </select>
 
@@ -78,56 +82,62 @@
                     <th>Quantity</th>
                 </tr>
                 <tr>
-                    <td><select class="form-select" name="product">
+                    <td><select class="form-select" name="product[]">
                             <?php
                             // Fetch products from the database
-                            $query = "SELECT name FROM products";
+                            $query = "SELECT id, name FROM products";
                             $stmt = $con->prepare($query);
                             $stmt->execute();
-                            $products = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                             // Generate select options
                             foreach ($products as $product) {
-                                echo "<option value='$product'>$product</option>";
+                                $product_id = $product['id'];
+                                $product_name = $product['name'];
+                                echo "<option value='$product_id'>$product_name</option>";
                             } ?>
                         </select>
-                    <td><input class="form-control" type="number" name="quantity"></td>
+                    <td><input class="form-control" type="number" name="quantity[]"></td>
                     </td>
 
                 </tr>
                 <tr>
-                    <td><select class="form-select" name="product">
+                    <td><select class="form-select" name="product[]">
                             <?php
                             // Fetch products from the database
-                            $query = "SELECT name FROM products";
+                            $query = "SELECT id, name FROM products";
                             $stmt = $con->prepare($query);
                             $stmt->execute();
-                            $products = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                             // Generate select options
                             foreach ($products as $product) {
-                                echo "<option value='$product'>$product</option>";
-                            } ?>
+                                $product_id = $product['id'];
+                                $product_name = $product['name'];
+                                echo "<option value='$product_id'>$product_name</option>";
+                            }  ?>
                         </select>
-                    <td><input class="form-control" type="number" name="quantity"></td>
+                    <td><input class="form-control" type="number" name="quantity[]"></td>
                     </td>
 
                 </tr>
                 <tr>
-                    <td><select class="form-select" name="product">
+                    <td><select class="form-select" name="product[]">
                             <?php
                             // Fetch products from the database
-                            $query = "SELECT name FROM products";
+                            $query = "SELECT id, name FROM products";
                             $stmt = $con->prepare($query);
                             $stmt->execute();
-                            $products = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                             // Generate select options
                             foreach ($products as $product) {
-                                echo "<option value='$product'>$product</option>";
-                            } ?>
+                                $product_id = $product['id'];
+                                $product_name = $product['name'];
+                                echo "<option value='$product_id'>$product_name</option>";
+                            }  ?>
                         </select>
-                    <td><input class="form-control" type="number" name="quantity"></td>
+                    <td><input class="form-control" type="number" name="quantity[]"></td>
                     </td>
                 </tr>
                 <tr>
