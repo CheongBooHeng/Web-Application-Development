@@ -21,15 +21,24 @@
         date_default_timezone_set('asia/Kuala_Lumpur');
         // include database connection
         include 'config/database.php';
-        $product_query = "SELECT id, name FROM products";
-        $product_stmt = $con->prepare($product_query);
-        $product_stmt->execute();
-        $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
         if ($_POST) {
             try {
                 $errors = array();
+                $customer = $_POST['customer'];
+                $product_id = $_POST['product'];
                 $quantity_array = $_POST['quantity'];
+
+                if (empty($customer)) {
+                    $errors[] = 'Please select a customer.';
+                }
+
+                foreach ($product_id as $product) {
+                    if (empty($product)) {
+                        $errors[] = "Please select the product.";
+                    }
+                }
                 foreach ($quantity_array as $quantity) {
                     if (empty($quantity)) {
                         $errors[] = "Please fill in the quantity for the selected products.";
@@ -47,7 +56,6 @@
                     echo "</div>";
                 } else {
                     $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
-                    $customer = $_POST['customer'];
                     $order_date = date('Y-m-d H:i:s'); // get the current date and time
                     $summary_stmt = $con->prepare($summary_query);
                     $summary_stmt->bindParam(':customer', $customer);
@@ -55,15 +63,11 @@
                     $summary_stmt->execute();
 
                     // order details
-
                     $order_id = $con->lastInsertId();
-
                     // array
-                    $product_id = $_POST['product'];
                     $quantity = $_POST['quantity'];
                     $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
                     $details_stmt = $con->prepare($details_query);
-
                     for ($i = 0; $i < count($product_id); $i++) {
                         $details_stmt->bindParam(':order_id', $order_id);
                         $details_stmt->bindParam(':customer_id', $customer);
@@ -83,7 +87,7 @@
         <form action="" method="POST">
             <span>Select customer</span>
             <select class="form-select mb-3" name="customer">
-                <option value='' selected disabled>Select customer</option>";
+                <option value=''>Select customer</option>";
                 <?php
                 // Fetch categories from the database
                 $query = "SELECT id, username FROM customers";
@@ -109,8 +113,12 @@
                     <td class="text-center">1</td>
                     <td class="d-flex">
                         <select class="form-select" name="product[]"> <!-- array -->
-                            <option value='' selected disabled>Select a product</option>;
+                            <option value=''>Select a product</option>;
                             <?php
+                            $product_query = "SELECT id, name FROM products";
+                            $product_stmt = $con->prepare($product_query);
+                            $product_stmt->execute();
+                            $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
                             // Generate select options
                             foreach ($products as $product) {
                                 echo "<option value='{$product['id']}'>{$product['name']}</option>";
@@ -126,14 +134,10 @@
 
                     </td>
                     <td colspan="4">
+                        <input type='submit' value='Place Order' class='btn btn-primary' />
                         <input type="button" value="Add More Product" class="btn btn-success add_one" />
+                        <a href='order_list.php' class='btn btn-danger'>Back to order list</a>
                     </td>
-                </tr>
-                <tr>
-                    <td>
-
-                    </td>
-                    <td colspan="4"><input type='submit' value='Place Order' class='btn btn-primary' /></td>
                 </tr>
             </table>
         </form>
