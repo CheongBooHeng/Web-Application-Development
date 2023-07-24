@@ -32,10 +32,10 @@
                 $quantity_array = $_POST['quantity'];
                 foreach ($quantity_array as $quantity) {
                     if (empty($quantity)) {
-                        $errors[] = "Please fill in the quantity for all products.";
+                        $errors[] = "Please fill in the quantity for the selected products.";
                     }
-                    if ($quantity == 0) {
-                        $errors[] = "Quantity cannot be zero.";
+                    if ($quantity <= 0) {
+                        $errors[] = "Quantity cannot be negative number or zero.";
                     }
                 }
 
@@ -55,13 +55,16 @@
                     $summary_stmt->execute();
 
                     // order details
-                    $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
+
                     $order_id = $con->lastInsertId();
+
+                    // array
+                    $product_id = $_POST['product'];
+                    $quantity = $_POST['quantity'];
+                    $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
                     $details_stmt = $con->prepare($details_query);
-                    for ($i = 0; $i < 3; $i++) {
-                        // array
-                        $product_id = $_POST['product'];
-                        $quantity = $_POST['quantity'];
+
+                    for ($i = 0; $i < count($product_id); $i++) {
                         $details_stmt->bindParam(':order_id', $order_id);
                         $details_stmt->bindParam(':customer_id', $customer);
                         // 这边叫出来每个
@@ -80,6 +83,7 @@
         <form action="" method="POST">
             <span>Select customer</span>
             <select class="form-select mb-3" name="customer">
+                <option value='' selected disabled>Select customer</option>";
                 <?php
                 // Fetch categories from the database
                 $query = "SELECT id, username FROM customers";
@@ -88,32 +92,34 @@
                 $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Generate select options
+
                 foreach ($customers as $customer) {
                     echo "<option value='{$customer['id']}'>{$customer['username']}</option>";
                 } ?>
             </select>
 
             <table class='table table-hover table-responsive table-bordered' id="row_del">
-            <tr>
+                <tr>
                     <td class="text-center">#</td>
                     <td class="text-center">Product</td>
                     <td class="text-center">Quantity</td>
                     <td class="text-center">Action</td>
                 </tr>
                 <tr class="pRow">
-                <td class="text-center">1</td>
-                <td class="d-flex">
-                    <select class="form-select" name="product[]"> <!-- array -->
+                    <td class="text-center">1</td>
+                    <td class="d-flex">
+                        <select class="form-select" name="product[]"> <!-- array -->
+                            <option value='' selected disabled>Select a product</option>;
                             <?php
-                                // Generate select options
-                                foreach ($products as $product) {
-                                    echo "<option value='{$product['id']}'>{$product['name']}</option>";
-                                }
+                            // Generate select options
+                            foreach ($products as $product) {
+                                echo "<option value='{$product['id']}'>{$product['name']}</option>";
+                            }
                             ?>
                         </select>
-                </td>
+                    </td>
                     <td><input class="form-control" type="number" name="quantity[]"></td> <!-- []array -->
-                    <td><input href='#' onclick='deleteRow(this)' class='btn d-flex justify-content-center btn-danger mt-1' value="Delete" /></td>
+                    <td><input href='#' onclick='deleteRow(this)' class='btn btn-danger m-auto' value="Delete" /></td>
                 </tr>
                 <tr>
                     <td>
@@ -124,10 +130,10 @@
                     </td>
                 </tr>
                 <tr>
-                <td>
+                    <td>
 
-                </td>
-                <td colspan="4"><input type='submit' value='Place Order' class='btn btn-primary' /></td>
+                    </td>
+                    <td colspan="4"><input type='submit' value='Place Order' class='btn btn-primary' /></td>
                 </tr>
             </table>
         </form>
