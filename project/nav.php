@@ -11,7 +11,7 @@
 
 <nav class="navbar navbar-expand-lg bg-info">
             <div class="collapse navbar-collapse justify-content-end me-3 ms-3" id="navbarNav">
-                <ul class="navbar-nav text-center">
+                <ul class="navbar-nav">
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Home</a>
                     </li>
@@ -20,7 +20,7 @@
                             aria-expanded="false">
                             Customer
                         </a>
-                        <ul class="dropdown-menu text-center">
+                        <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="customer_create.php">Create Customer</a></li>
                             <li><a class="dropdown-item" href="customer_read.php">Read Customer</a></li>
                         </ul>
@@ -30,7 +30,7 @@
                             aria-expanded="false">
                             Product
                         </a>
-                        <ul class="dropdown-menu text-center">
+                        <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="product_create.php">Create Product</a></li>
                             <li><a class="dropdown-item" href="product_read.php">Read Product</a></li>
                         </ul>
@@ -40,7 +40,7 @@
                             aria-expanded="false">
                             Order
                         </a>
-                        <ul class="dropdown-menu text-center">
+                        <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="order_create.php">Create Order</a></li>
                             <li><a class="dropdown-item" href="order_list.php">Read Order</a></li>
                         </ul>
@@ -50,7 +50,7 @@
                             aria-expanded="false">
                             Category
                         </a>
-                        <ul class="dropdown-menu text-center">
+                        <ul class="dropdown-menu ">
                             <li><a class="dropdown-item" href="categories_create.php">Create Category</a></li>
                             <li><a class="dropdown-item" href="categories_read.php">Read Category</a></li>
                         </ul>

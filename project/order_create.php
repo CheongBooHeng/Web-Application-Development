@@ -29,6 +29,7 @@
                 $customer = $_POST['customer'];
                 $product_id = $_POST['product'];
                 $quantity_array = $_POST['quantity'];
+                $selected_product = count($_POST['product']);
 
                 if (empty($customer)) {
                     $errors[] = 'Please select a customer.';
@@ -97,8 +98,9 @@
 
                 // Generate select options
 
-                foreach ($customers as $customer) {
-                    echo "<option value='{$customer['id']}'>{$customer['username']}</option>";
+                for ($x = 0; $x < count($customers); $x++) {
+                    $customer_selected = isset($_POST["customer"]) && $customers[$x]['id'] == $_POST["customer"] ? "selected" : "";
+                    echo "<option value='{$customers[$x]['id']}' $customer_selected>{$customers[$x]['username']}</option>";
                 } ?>
             </select>
 
@@ -109,6 +111,11 @@
                     <td class="text-center">Quantity</td>
                     <td class="text-center">Action</td>
                 </tr>
+
+                <?php
+        $product_keep = (!empty($error)) ? $selected_product : 1;
+        for ($x = 0; $x < $product_keep; $x++){
+            ?>
                 <tr class="pRow">
                     <td class="text-center">1</td>
                     <td class="d-flex">
@@ -120,14 +127,17 @@
                             $product_stmt->execute();
                             $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
                             // Generate select options
-                            foreach ($products as $product) {
-                                echo "<option value='{$product['id']}'>{$product['name']}</option>";
-                            }
+                            for ($i = 0; $i < count($products); $i++) {
+                                $product_selected = isset($_POST["product"]) && $products[$i]['id'] == $_POST["product"][$x] ? "selected" : "";
+                                echo "<option value='{$products[$i]['id']}' $product_selected>{$products[$i]['name']}</option>";
+               }
                             ?>
                         </select>
                     </td>
-                    <td><input class="form-control" type="number" name="quantity[]"></td> <!-- []array -->
+                    <td><input class="form-control" type="number" name="quantity[]" value="<?php echo isset($_POST['quantity']) ? $_POST['quantity'][$x] : 0; ?>"></td> <!-- []array -->
                     <td><input href='#' onclick='deleteRow(this)' class='btn btn-danger m-auto' value="Delete" /></td>
+                    <?php
+                } ?>
                 </tr>
                 <tr>
                     <td>
