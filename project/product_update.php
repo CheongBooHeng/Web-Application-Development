@@ -74,6 +74,46 @@
                 $manufacture_date = htmlspecialchars(strip_tags($_POST['manufacture_date']));
                 $expired_date = htmlspecialchars(strip_tags($_POST['expired_date']));
                 $category_name = htmlspecialchars(strip_tags($_POST['category_name']));
+
+                $errors = array();
+                if (empty($name)) {
+                    $errors[] = 'Product name is required.';
+                }
+
+                if (empty($description)) {
+                    $errors[] = 'Description is required.';
+                }
+
+                if (empty($price)) {
+                    $errors[] = "Price is required.";
+                } elseif (!is_numeric($price)) {
+                    $errors[] = "Product price must be a numeric value.";
+                }
+
+                if (empty($promotion)) {
+                    $errors[] = 'Promotion price is required.';
+                } elseif ($promotion >= $price) {
+                    $errors[] = 'Promotion price must be cheaper than original price.';
+                }
+
+                if (empty($manufacture)) {
+                    $errors[] = 'Manufacture date is required.';
+                } elseif ($expired <= $manufacture) {
+                    $errors[] = 'Expired date must be later than manufacture date.';
+                }
+
+                if (empty($expired)) {
+                    $errors[] = "Expired date is required.";
+                }
+
+                if (!empty($errors)) {
+                    echo "<div class='alert alert-danger'>";
+                    foreach ($errors as $displayError) {
+                        echo $displayError . "<br>";
+                    }
+                    echo "</div>";
+                }else{
+
                 // bind the parameters
                 $stmt->bindParam(':id', $id);
                 $stmt->bindParam(':name', $name);
@@ -90,6 +130,7 @@
                     echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
                 }
             }
+        }
             // show errors
             catch (PDOException $exception) {
                 die('ERROR: ' . $exception->getMessage());
