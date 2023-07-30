@@ -90,19 +90,19 @@
                     $errors[] = "Product price must be a numeric value.";
                 }
 
-                if (empty($promotion)) {
+                if (empty($promotion_price)) {
                     $errors[] = 'Promotion price is required.';
-                } elseif ($promotion >= $price) {
+                } elseif ($promotion_price >= $price) {
                     $errors[] = 'Promotion price must be cheaper than original price.';
                 }
 
-                if (empty($manufacture)) {
+                if (empty($manufacture_date)) {
                     $errors[] = 'Manufacture date is required.';
-                } elseif ($expired <= $manufacture) {
+                } elseif ($expired_date <= $manufacture_date) {
                     $errors[] = 'Expired date must be later than manufacture date.';
                 }
 
-                if (empty($expired)) {
+                if (empty($expired_date)) {
                     $errors[] = "Expired date is required.";
                 }
 
@@ -112,25 +112,25 @@
                         echo $displayError . "<br>";
                     }
                     echo "</div>";
-                }else{
-
-                // bind the parameters
-                $stmt->bindParam(':id', $id);
-                $stmt->bindParam(':name', $name);
-                $stmt->bindParam(':description', $description);
-                $stmt->bindParam(':price', $price);
-                $stmt->bindParam(':promotion_price', $promotion_price);
-                $stmt->bindParam(':manufacture_date', $manufacture_date);
-                $stmt->bindParam(':expired_date', $expired_date);
-                $stmt->bindParam(':category_name', $category_name);
-                // Execute the query
-                if ($stmt->execute()) {
-                    echo "<div class='alert alert-success'>Record was updated.</div>";
                 } else {
-                    echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
+
+                    // bind the parameters
+                    $stmt->bindParam(':id', $id);
+                    $stmt->bindParam(':name', $name);
+                    $stmt->bindParam(':description', $description);
+                    $stmt->bindParam(':price', $price);
+                    $stmt->bindParam(':promotion_price', $promotion_price);
+                    $stmt->bindParam(':manufacture_date', $manufacture_date);
+                    $stmt->bindParam(':expired_date', $expired_date);
+                    $stmt->bindParam(':category_name', $category_name);
+                    // Execute the query
+                    if ($stmt->execute()) {
+                        echo "<div class='alert alert-success'>Record was updated.</div>";
+                    } else {
+                        echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
+                    }
                 }
             }
-        }
             // show errors
             catch (PDOException $exception) {
                 die('ERROR: ' . $exception->getMessage());
@@ -168,17 +168,20 @@
                 </tr>
                 <tr>
                     <td>Categories</td>
-                    <td><select class="form-select" name="category_name"><?php
+                    <td><select class="form-select" name="category_name">
+                            <?php
                             // Fetch categories from the database
                             $query = "SELECT category_name FROM categories";
                             $stmt = $con->prepare($query);
                             $stmt->execute();
-                            $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                            
+                            while ($category_row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                $all_category = $category_row['category_name'];
 
-                            // Generate select options
-                            foreach ($categories as $category) {
-                                echo "<option value='$category'>$category</option>";
-                            } ?></select>
+                                $selected = ($all_category == $row['category_name']) ? "selected" : "";
+                                echo "<option value='" . $all_category . "' $selected>" . htmlspecialchars($all_category) . "</option>";
+                            }
+                            ?></select>
                     </td>
                 </tr>
                 <tr>
