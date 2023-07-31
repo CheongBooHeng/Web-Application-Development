@@ -28,6 +28,7 @@
         try {
             // prepare select query
             $query = "SELECT id, username, password, firstname, lastname, gender, date_of_birth, account_status, email FROM customers WHERE id = ? LIMIT 0,1";
+            //0=offset 
             $stmt = $con->prepare($query);
 
             // this is the first question mark
@@ -64,36 +65,60 @@
                 // in this case, it seemed like we have so many fields to pass and
                 // it is better to label them and not use question marks
                 $query = "UPDATE customers
-                SET username=:username, password=:password, firstname=:firstname, lastname=:lastname, gender=:gender, date_of_birth=:date_of_birth, account_status=:account_status, email=:email WHERE id = :id";
+                SET username=:username, firstname=:firstname, lastname=:lastname, gender=:gender, date_of_birth=:date_of_birth, account_status=:account_status, email=:email";
                 // prepare query for excecution
                 $stmt = $con->prepare($query);
                 // posted values
-                $username = htmlspecialchars(strip_tags($_POST['username']));
+                $username = htmlspecialchars(strip_tags($_POST['username'])); //改
                 $oldpassword = $_POST['oldpassword'];
                 $newpassword = $_POST['newpassword'];
                 $confirmpassword = $_POST['confirmpassword'];
                 $firstname = htmlspecialchars(strip_tags($_POST['firstname']));
                 $lastname = htmlspecialchars(strip_tags($_POST['lastname']));
-                $gender = htmlspecialchars(strip_tags($_POST['gender']));
-                $date_of_birth = htmlspecialchars(strip_tags($_POST['date_of_birth']));
-                $account_status = htmlspecialchars(strip_tags($_POST['account_status']));
+                $gender = $_POST['gender'];
+                $date_of_birth = $_POST['date_of_birth'];
+                $account_status = $_POST['account_status'];
                 $email = htmlspecialchars(strip_tags($_POST['email']));
 
                 $errors = array();
-                if (!empty($_POST['oldpassword'])) {
-                    if (password_verify($oldpassword, $row['password'])) {
-                        if ($newpassword == $oldpassword) {
-                            $errors[] = "New Password cannot same with old password.";
-                        } else if ($newpassword == $confirmpassword) {
-                            $formatted_password = password_hash($newpassword, PASSWORD_DEFAULT);
+
+
+                //check 新pw format, newpw=cpw一样不一样, oldpw, oldpw==newpw
+                // if (!empty($_POST['oldpassword']) && !empty($_POST['newpassword']) && !empty($_POST['confirmpassword'])) {
+                //     if (password_verify($oldpassword, $row['password'])) {
+                //         if ($newpassword == $oldpassword) {
+                //             $errors[] = "New Password cannot same with old password.";
+                //         } else if ($newpassword == $confirmpassword) {
+                //             $formatted_password = password_hash($newpassword, PASSWORD_DEFAULT);
+                //         } else {
+                //             $errors[] = "Confirm password does not match with new password.";
+                //         }
+                //     } else {
+                //         $errors[] = "You entered the wrong password for old password";
+                //     }
+                // } else {
+                //     $formatted_password = $password;
+                // }
+
+
+                if (!empty($_POST['oldpassword']) && !empty($_POST['newpassword']) && !empty($_POST['confirmpassword'])) {
+                    if ($newpassword == $confirmpassword) {
+                        if (password_verify($oldpassword, $password)) {
+                            if ($oldpassword == $password) {
+                                if ($oldpassword == $newpassword) {
+                                    $errors[] = "New Password can't be same with Old Password";
+                                } else {
+                                    $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
+                                }
+                            }
                         } else {
-                            $errors[] = "Confirm password does not match with new password.";
+                            $errors[] = "Wrong password entered in old password column";
                         }
                     } else {
-                        $errors[] = "You entered the wrong password for old password";
+                        $errors[] = "The confirm password doesn't match with new password.";
                     }
-                } else {
-                    $formatted_password = $password;
+                }else{
+                    $hashed_password = $password;
                 }
 
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -107,10 +132,17 @@
                     }
                     echo "</div>";
                 } else {
+                    if (isset($hashed_password)) {
+                        $query .= ", password=:password";
+                    }
+                    $query .= " WHERE id=:id";
+                    $stmt = $con->prepare($query);
                     // bind the parameters
                     $stmt->bindParam(':id', $id);
                     $stmt->bindParam(':username', $username);
-                    $stmt->bindParam(':password', $formatted_password);
+                    if (isset($hashed_password)) {
+                        $stmt->bindParam(':password', $hashed_password);
+                    }
                     $stmt->bindParam(':firstname', $firstname);
                     $stmt->bindParam(':lastname', $lastname);
                     $stmt->bindParam(':gender', $gender);
@@ -179,15 +211,13 @@
                 <tr>
                     <td>Account Status</td>
                     <td>
-                        <input type="radio" name="account_status" id="active" value="Active" 
-                        <?php if ($row['account_status'] == "Active") {
-                                                                                            echo 'checked';
-                                                                                        } ?>>
+                        <input type="radio" name="account_status" id="active" value="Active" <?php if ($row['account_status'] == "Active") {
+                                                                                                    echo 'checked';
+                                                                                                } ?>>
                         <label class="form-check-label" for="active">Active</label>
-                        <input type="radio" name="account_status" id="inactive" value="Inactive"
-                        <?php if ($row['account_status'] == "Inactive") {
-                                                                                            echo 'checked';
-                                                                                        } ?>>
+                        <input type="radio" name="account_status" id="inactive" value="Inactive" <?php if ($row['account_status'] == "Inactive") {
+                                                                                                        echo 'checked';
+                                                                                                    } ?>>
                         <label class="form-check-label" for="inactive">Inactive</label>
                     </td>
                 </tr>

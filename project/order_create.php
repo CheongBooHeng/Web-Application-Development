@@ -31,6 +31,20 @@
                 $quantity_array = $_POST['quantity'];
                 $selected_product = count($_POST['product']);
 
+                $noduplicate = array_unique($product_id);
+
+                if (sizeof($noduplicate) != sizeof($product_id)) {
+                    foreach ($product_id as $key => $val) {
+                        if (!array_key_exists($key, $noduplicate)) {
+                            $errors[] = "Duplicated products have been chosen " ;
+                            array_splice($product_id, $key, 1);
+                            array_splice($quantity_array, $key, 1);
+                        }
+                    }
+                }
+
+                $selected_product_count = isset($noduplicate) ? count($noduplicate) : count($_POST['product']);
+
                 if (empty($customer)) {
                     $errors[] = 'Please select a customer.';
                 }
@@ -86,7 +100,6 @@
         ?>
 
         <form action="" method="POST">
-            <span>Select customer</span>
             <select class="form-select mb-3" name="customer">
                 <option value=''>Select customer</option>";
                 <?php
@@ -113,42 +126,42 @@
                 </tr>
 
                 <?php
-        $product_keep = (!empty($error)) ? $selected_product : 1;
-        for ($x = 0; $x < $product_keep; $x++){
-            ?>
-                <tr class="pRow">
-                    <td class="text-center">1</td>
-                    <td class="d-flex">
-                        <select class="form-select" name="product[]"> <!-- array -->
-                            <option value=''>Select a product</option>;
-                            <?php
-                            $product_query = "SELECT id, name FROM products";
-                            $product_stmt = $con->prepare($product_query);
-                            $product_stmt->execute();
-                            $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
-                            // Generate select options
-                            for ($i = 0; $i < count($products); $i++) {
-                                $product_selected = isset($_POST["product"]) && $products[$i]['id'] == $_POST["product"][$x] ? "selected" : "";
-                                echo "<option value='{$products[$i]['id']}' $product_selected>{$products[$i]['name']}</option>";
-               }
-                            ?>
-                        </select>
-                    </td>
-                    <td><input class="form-control" type="number" name="quantity[]" value="<?php echo isset($_POST['quantity']) ? $_POST['quantity'][$x] : 0; ?>"></td> <!-- []array -->
-                    <td><input href='#' onclick='deleteRow(this)' class='btn btn-danger m-auto' value="Delete" /></td>
+                $product_keep = (!empty($error)) ? $selected_product : 1;
+                for ($x = 0; $x < $product_keep; $x++) {
+                ?>
+                    <tr class="pRow">
+                        <td class="text-center">1</td>
+                        <td class="d-flex">
+                            <select class="form-select" name="product[]"> <!-- array -->
+                                <option value=''>Select a product</option>;
+                                <?php
+                                $product_query = "SELECT id, name FROM products";
+                                $product_stmt = $con->prepare($product_query);
+                                $product_stmt->execute();
+                                $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
+                                // Generate select options
+                                for ($i = 0; $i < count($products); $i++) {
+                                    $product_selected = isset($_POST["product"]) && $products[$i]['id'] == $_POST["product"][$x] ? "selected" : "";
+                                    echo "<option value='{$products[$i]['id']}' $product_selected>{$products[$i]['name']}</option>";
+                                }
+                                ?>
+                            </select>
+                        </td>
+                        <td><input class="form-control" type="number" name="quantity[]" value="<?php echo isset($_POST['quantity']) ? $_POST['quantity'][$x] : 0; ?>"></td> <!-- []array -->
+                        <td><input href='#' onclick='deleteRow(this)' class='btn btn-danger m-auto' value="Delete" /></td>
                     <?php
                 } ?>
-                </tr>
-                <tr>
-                    <td>
+                    </tr>
+                    <tr>
+                        <td>
 
-                    </td>
-                    <td colspan="4">
-                        <input type='submit' value='Place Order' class='btn btn-primary' />
-                        <input type="button" value="Add More Product" class="btn btn-success add_one" />
-                        <a href='order_list.php' class='btn btn-danger'>Back to order list</a>
-                    </td>
-                </tr>
+                        </td>
+                        <td colspan="4">
+                            <input type='submit' value='Place Order' class='btn btn-primary' />
+                            <input type="button" value="Add More Product" class="btn btn-success add_one" />
+                            <a href='order_list.php' class='btn btn-danger'>Back to order list</a>
+                        </td>
+                    </tr>
             </table>
         </form>
         <script>
