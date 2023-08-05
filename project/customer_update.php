@@ -104,13 +104,13 @@
                 if (!empty($_POST['oldpassword']) && !empty($_POST['newpassword']) && !empty($_POST['confirmpassword'])) {
                     if ($newpassword == $confirmpassword) {
                         if (password_verify($oldpassword, $password)) {
-                            if ($oldpassword == $password) {
+                            
                                 if ($oldpassword == $newpassword) {
-                                    $errors[] = "New Password can't be same with Old Password";
+                                    $errors[] = "New password can't be same with old password";
                                 } else {
                                     $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
                                 }
-                            }
+                            
                         } else {
                             $errors[] = "Wrong password entered in old password column";
                         }
