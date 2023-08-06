@@ -55,6 +55,7 @@
             $noduplicate = array_unique($product_id);
 
             if (sizeof($noduplicate) != sizeof($product_id)) {
+
                 foreach ($product_id as $key => $val) {
                     if (!array_key_exists($key, $noduplicate)) {
                         $errors[] = "Duplicated products have been chosen " . $products[$val - 1]['name'] . ".";
@@ -131,6 +132,7 @@
                                 <option value="">Choose a Product</option>
                                 <?php
                                 for ($i = 0; $i < count($products); $i++) {
+
                                     $product_selected = $products[$i]['id'] == $order_details[$x]['product_id'] ? "selected" : "";
                                     echo "<option value='{$products[$i]['id']}' $product_selected>{$products[$i]['name']}</option>";
                                 }

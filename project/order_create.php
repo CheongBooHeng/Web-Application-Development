@@ -30,40 +30,23 @@
                 $product_id = $_POST['product'];
                 $quantity_array = $_POST['quantity'];
 
+
                 $noduplicate = array_unique($product_id);
+
 
                 if (sizeof($noduplicate) != sizeof($product_id)) {
                     foreach ($product_id as $key => $val) {
                         if (!array_key_exists($key, $noduplicate)) {
                             $errors[] = "Duplicated products have been chosen ";
-                            array_splice($product_id, $key, 1);
-                            array_splice($quantity_array, $key, 1);
+                            unset($quantity_array[$key]);
                         }
                     }
                 }
-
                 $product_id = array_values($noduplicate);
                 $quantity_array = array_values($quantity_array);
 
                 $selected_product_count = isset($noduplicate) ? count($noduplicate) : count($_POST['product']);
 
-                // if (empty($customer)) {
-                //     $errors[] = 'Please select a customer.';
-                // }
-
-                // foreach ($product_id as $product) {
-                //     if (empty($product)) {
-                //         $errors[] = "Please select the product.";
-                //     }
-                // }
-                // foreach ($quantity_array as $quantity) {
-                //     if (empty($quantity)) {
-                //         $errors[] = "Please fill in the quantity for the selected products.";
-                //     }
-                //     if ($quantity <= 0) {
-                //         $errors[] = "Quantity cannot be negative number or zero.";
-                //     }
-                // }
 
                 if ($customer == "") {
                     $errors[] = "Please choose your username.";
@@ -159,7 +142,7 @@
                                 $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 // Generate select options
                                 for ($i = 0; $i < count($products); $i++) {
-                                    $product_selected = isset($_POST["product"]) && $products[$i]['id'] == $_POST["product"][$x] ? "selected" : "";
+                                    $product_selected = isset($_POST["product"]) && $products[$i]['id'] == $product_id[$x] ? "selected" : "";
                                     echo "<option value='{$products[$i]['id']}' $product_selected>{$products[$i]['name']}</option>";
                                 }
                                 ?>
