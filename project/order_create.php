@@ -35,18 +35,21 @@
                 if (sizeof($noduplicate) != sizeof($product_id)) {
                     foreach ($product_id as $key => $val) {
                         if (!array_key_exists($key, $noduplicate)) {
-                            $errors[] = "Duplicated products have been chosen " ;
+                            $errors[] = "Duplicated products have been chosen ";
                             array_splice($product_id, $key, 1);
                             array_splice($quantity_array, $key, 1);
                         }
                     }
                 }
 
+                $product_id = array_values($noduplicate);
+                $quantity_array = array_values($quantity_array);
+
                 $selected_product_count = isset($noduplicate) ? count($noduplicate) : count($_POST['product']);
 
-                if (empty($customer)) {
-                    $errors[] = 'Please select a customer.';
-                }
+                // if (empty($customer)) {
+                //     $errors[] = 'Please select a customer.';
+                // }
 
                 // foreach ($product_id as $product) {
                 //     if (empty($product)) {
@@ -62,20 +65,23 @@
                 //     }
                 // }
 
+                if ($customer == "") {
+                    $errors[] = "Please choose your username.";
+                }
+
                 if (isset($selected_product_count)) {
                     for ($i = 0; $i < $selected_product_count; $i++) {
                         if ($product_id[$i] == "") {
                             $errors[] = " Please choose the product for NO " . $i + 1 . ".";
                         }
 
-                        if ($quantity[$i] == 0 || empty($quantity_array[$i])) {
-                            $errors[] = "Quantity Can not be zero or empty.";
+                        if ($quantity_array[$i] == 0 || empty($quantity_array[$i])) {
+                            $errors[] = "Quantity cannot be zero.";
                         } else if ($quantity_array[$i] < 0) {
-                            $errors[] = "Quantity Can not be negative number.";
+                            $errors[] = "Quantity cannot be negative number.";
                         }
                     }
                 }
-
                 if (!empty($errors)) {
                     echo "<div class='alert alert-danger'>";
                     foreach ($errors as $displayError) {
@@ -92,19 +98,19 @@
 
                     // order details
                     $order_id = $con->lastInsertId();
-                    // array
-                    $quantity = $_POST['quantity'];
+
+                    for ($i = 0; $i < $selected_product_count; $i++) {
                     $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
                     $details_stmt = $con->prepare($details_query);
-                    for ($i = 0; $i < count($product_id); $i++) {
                         $details_stmt->bindParam(':order_id', $order_id);
                         $details_stmt->bindParam(':customer_id', $customer);
                         // 这边叫出来每个
                         $details_stmt->bindParam(':product_id', $product_id[$i]);
-                        $details_stmt->bindParam(':quantity', $quantity[$i]);
+                        $details_stmt->bindParam(':quantity', $quantity_array[$i]);
                         $details_stmt->execute();
                     }
                     echo "<div class='alert alert-success'>Order successfully.</div>";
+                    $_POST = array();
                 }
             } catch (PDOException $exception) {
                 echo "<div class='alert alert-danger'>Unable to place order.</div>";
