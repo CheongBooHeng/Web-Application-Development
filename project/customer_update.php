@@ -100,26 +100,28 @@
                 //     $formatted_password = $password;
                 // }
 
-
-                if (!empty($_POST['oldpassword']) && !empty($_POST['newpassword']) && !empty($_POST['confirmpassword'])) {
-                    if ($newpassword == $confirmpassword) {
-                        if (password_verify($oldpassword, $password)) {
-                            
+                if (!empty($oldpassword) && !empty($newpassword) && !empty($confirmpassword)) {
+                    // Password format validation
+                    if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?!.*[-+$()%@#]).{6,}$/', $newpassword)) {
+                        $errors[] = 'Invalid new password format.';
+                    } else {
+                        if ($newpassword == $confirmpassword) {
+                            if (password_verify($oldpassword, $password)) {
                                 if ($oldpassword == $newpassword) {
-                                    $errors[] = "New password can't be same with old password";
+                                    $errors[] = "New password can't be the same as the old password.";
                                 } else {
                                     $hashed_password = password_hash($newpassword, PASSWORD_DEFAULT);
                                 }
-                            
+                            } else {
+                                $errors[] = "Wrong password entered in the old password column.";
+                            }
                         } else {
-                            $errors[] = "Wrong password entered in old password column";
+                            $errors[] = "The confirm password doesn't match the new password.";
                         }
-                    } else {
-                        $errors[] = "The confirm password doesn't match with new password.";
                     }
-                }else{
+                } else {
                     $hashed_password = $password;
-                }
+                }                
 
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $errors[] = "Invalid Email format.";

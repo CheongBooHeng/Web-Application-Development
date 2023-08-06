@@ -29,7 +29,6 @@
                 $customer = $_POST['customer'];
                 $product_id = $_POST['product'];
                 $quantity_array = $_POST['quantity'];
-                $selected_product = count($_POST['product']);
 
                 $noduplicate = array_unique($product_id);
 
@@ -49,17 +48,31 @@
                     $errors[] = 'Please select a customer.';
                 }
 
-                foreach ($product_id as $product) {
-                    if (empty($product)) {
-                        $errors[] = "Please select the product.";
-                    }
-                }
-                foreach ($quantity_array as $quantity) {
-                    if (empty($quantity)) {
-                        $errors[] = "Please fill in the quantity for the selected products.";
-                    }
-                    if ($quantity <= 0) {
-                        $errors[] = "Quantity cannot be negative number or zero.";
+                // foreach ($product_id as $product) {
+                //     if (empty($product)) {
+                //         $errors[] = "Please select the product.";
+                //     }
+                // }
+                // foreach ($quantity_array as $quantity) {
+                //     if (empty($quantity)) {
+                //         $errors[] = "Please fill in the quantity for the selected products.";
+                //     }
+                //     if ($quantity <= 0) {
+                //         $errors[] = "Quantity cannot be negative number or zero.";
+                //     }
+                // }
+
+                if (isset($selected_product_count)) {
+                    for ($i = 0; $i < $selected_product_count; $i++) {
+                        if ($product_id[$i] == "") {
+                            $errors[] = " Please choose the product for NO " . $i + 1 . ".";
+                        }
+
+                        if ($quantity[$i] == 0 || empty($quantity_array[$i])) {
+                            $errors[] = "Quantity Can not be zero or empty.";
+                        } else if ($quantity_array[$i] < 0) {
+                            $errors[] = "Quantity Can not be negative number.";
+                        }
                     }
                 }
 
