@@ -145,11 +145,11 @@
                 </tr>
 
                 <?php
-                $product_keep = (!empty($error)) ? $selected_product : 1;
+                $product_keep = (!empty($errors)) ? $selected_product_count : 1;
                 for ($x = 0; $x < $product_keep; $x++) {
                 ?>
                     <tr class="pRow">
-                        <td class="text-center">1</td>
+                    <td class="text-center"><?php echo $x+1?></td>
                         <td class="d-flex">
                             <select class="form-select" name="product[]"> <!-- array -->
                                 <option value=''>Select a product</option>;
