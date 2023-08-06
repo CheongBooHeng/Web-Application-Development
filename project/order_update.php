@@ -89,6 +89,20 @@
                     }
                     echo "</div>";
                 } else {
+                    $delete_details_query = "DELETE FROM order_details WHERE order_id=:order_id";
+                    $delete_details_stmt = $con->prepare($delete_details_query);
+                    $delete_details_stmt->bindParam(":order_id", $id);
+                    $order_date = date('Y-m-d H:i:s');
+                    $delete_details_stmt->execute();
+
+                    for ($i = 0; $i < $selected_product_count; $i++) {
+                        $order_details_query = "INSERT INTO order_details SET order_id=:order_id, product_id=:product_id, quantity=:quantity";
+                        $order_details_stmt = $con->prepare($order_details_query);
+                        $order_details_stmt->bindParam(":order_id", $id);
+                        $order_details_stmt->bindParam(":product_id", $product_id[$i]);
+                        $order_details_stmt->bindParam(":quantity", $quantity_array[$i]);
+                        $order_details_stmt->execute();
+                    }
                     echo "<div class='alert alert-success' role='alert'>Order Placed Successfully.</div>";
                     $_POST = array();
                 }
