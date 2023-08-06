@@ -100,10 +100,9 @@
                     $order_id = $con->lastInsertId();
 
                     for ($i = 0; $i < $selected_product_count; $i++) {
-                    $details_query = "INSERT INTO order_details SET order_id=:order_id, customer_id=:customer_id, product_id=:product_id, quantity=:quantity";
+                    $details_query = "INSERT INTO order_details SET order_id=:order_id, product_id=:product_id, quantity=:quantity";
                     $details_stmt = $con->prepare($details_query);
                         $details_stmt->bindParam(':order_id', $order_id);
-                        $details_stmt->bindParam(':customer_id', $customer);
                         // 这边叫出来每个
                         $details_stmt->bindParam(':product_id', $product_id[$i]);
                         $details_stmt->bindParam(':quantity', $quantity_array[$i]);
