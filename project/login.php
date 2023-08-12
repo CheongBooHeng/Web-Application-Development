@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (isset($_SESSION["customer_id"])){
+    header("Location: index.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,10 +18,6 @@
 
 <body>
     <div class="container">
-        <div class="text-center mb-3">
-            <h1>Log In</h1>
-        </div>
-
         <?php
         include 'config/database.php';
 
@@ -47,7 +51,8 @@
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                     if ($row) {
                         if (password_verify($password, $row['password'])) {
-                            if ($row['account_status'] == 'Active') {
+                            if ($row['account_status'] == 'Active') {;
+                                $_SESSION['customer_id'] = $row['id'];
                                 header("Location: index.php");
                                 exit();
                             } else {
@@ -82,8 +87,9 @@
 
 
         ?>
-        <form action="" method="POST">
-            <div class="form-floating mb-3">
+        <form action="" method="POST" class="border border-3 p-3 rounded w-50 m-auto">
+            <h5 class="text-center">Welcome!</h5>
+            <div class="form-floating mb-3 ">
                 <input type="text" class="form-control" name="username_email" id="username_email" placeholder="name@example.com">
                 <label for="username_email">Username/Email</label>
             </div>
@@ -92,7 +98,7 @@
                 <label for="password">Password</label>
             </div>
             <div class="button">
-                <button class="btn btn-outline-success mb-2" type="submit">Log in</button>
+                <button class="btn btn-outline-success" type="submit">Log in</button>
             </div>
         </form>
     </div>

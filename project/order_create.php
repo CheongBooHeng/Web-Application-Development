@@ -1,3 +1,4 @@
+<?php include "session.php"?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,10 +31,10 @@
                 $product_id = $_POST['product'];
                 $quantity_array = $_POST['quantity'];
 
-
+                //array里面有一样的东西就会删掉
                 $noduplicate = array_unique($product_id);
 
-
+                //有填到一样的东西才跑下面的
                 if (sizeof($noduplicate) != sizeof($product_id)) {
                     foreach ($product_id as $key => $val) {
                         if (!array_key_exists($key, $noduplicate)) {
@@ -46,7 +47,6 @@
                 $quantity_array = array_values($quantity_array);
 
                 $selected_product_count = isset($noduplicate) ? count($noduplicate) : count($_POST['product']);
-
 
                 if ($customer == "") {
                     $errors[] = "Please choose your username.";
