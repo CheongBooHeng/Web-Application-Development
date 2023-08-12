@@ -1,4 +1,4 @@
-<?php include "session.php"?>
+<?php include "session.php" ?>
 <!DOCTYPE HTML>
 <html>
 
@@ -25,6 +25,14 @@
         <?php
         include 'config/database.php';
 
+        // delete message prompt will be here
+        $action = isset($_GET['action']) ? $_GET['action'] : "";
+
+        // if it was redirected from delete.php
+        if ($action == 'deleted') {
+            echo "<div class='alert alert-success'>Record was deleted.</div>";
+        }
+
         $search = isset($_GET['search']) ? $_GET['search'] : '';
         $query = "SELECT order_summary.order_id, customers.firstname, customers.lastname, order_summary.order_date FROM order_summary INNER JOIN customers ON order_summary.customer_id = customers.id";
         if (!empty($search)) {
@@ -40,7 +48,7 @@
         $stmt->execute();
         $num = $stmt->rowCount();
 
-            echo '<a href="order_create.php" class="btn btn-primary mb-3">Create New Order</a>';
+        echo '<a href="order_create.php" class="btn btn-primary mb-3">Create New Order</a>';
 
         if ($num > 0) {
             echo "<table class='table table-hover table-responsive table-bordered'>";
@@ -79,6 +87,18 @@
         }
         ?>
     </div>
+
+    <script type='text/javascript'>
+        // confirm record deletion
+        function delete_product(id) {
+            if (confirm('Are you sure?')) {
+                // if user clicked ok,
+                // pass the id to delete.php and execute the delete query
+                window.location = 'order_delete.php?id=' + id;
+            }
+        }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
 

@@ -1,4 +1,4 @@
-<?php include "session.php"?>
+<?php include "session.php" ?>
 <!DOCTYPE HTML>
 <html>
 
@@ -29,6 +29,12 @@
         include 'config/database.php';
 
         // delete message prompt will be here
+        $action = isset($_GET['action']) ? $_GET['action'] : "";
+
+        // if it was redirected from delete.php
+        if ($action == 'deleted') {
+            echo "<div class='alert alert-success'>Record was deleted.</div>";
+        }
 
         // select all data
         $search = isset($_GET['search']) ? $_GET['search'] : '';
@@ -109,12 +115,21 @@
             echo "<div class='alert alert-danger'>No records found.</div>";
         }
         ?>
-
-
-
     </div> <!-- end .container -->
 
     <!-- confirm delete record will be here -->
+    <script type='text/javascript'>
+        // confirm record deletion
+        function delete_product(id) {
+
+            if (confirm('Are you sure?')) {
+                // if user clicked ok,
+                // pass the id to delete.php and execute the delete query
+                window.location = 'product_delete.php?id=' + id;
+            }
+        }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
 
