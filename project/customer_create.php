@@ -12,7 +12,7 @@
     <!-- container -->
     <div class="container">
         <?php
-        include 'nav.php';
+        include 'navbar/nav.php';
         ?>
         <div class="page-header">
             <h1>Create Customer</h1>

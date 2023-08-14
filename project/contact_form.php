@@ -12,7 +12,7 @@
 <body>
     <div class="container">
         <?php
-        include 'nav.php';
+        include 'navbar/nav.php';
         ?>
         <div class="page-header">
             <h1>Contact Us</h1>

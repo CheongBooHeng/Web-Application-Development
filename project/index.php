@@ -12,7 +12,7 @@
 <body>
     <div class="container">
         <?php
-        include 'nav.php';
+        include 'navbar/nav.php';
         ?>
         <div class="text-center">
             <h1>HOMEPAGE</h1>

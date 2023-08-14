@@ -11,7 +11,7 @@
     <!-- container -->
     <div class="container">
         <?php
-        include 'nav.php';
+        include 'navbar/nav.php';
         ?>
         <div class="page-header">
             <h1>Update Product</h1>
