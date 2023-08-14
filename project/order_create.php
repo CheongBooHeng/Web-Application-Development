@@ -23,7 +23,10 @@
         // include database connection
         include 'config/database.php';
 
-
+        $product_query = "SELECT * FROM products";
+        $product_stmt = $con->prepare($product_query);
+        $product_stmt->execute();
+        $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
         if ($_POST) {
             try {
                 $errors = array();
@@ -72,11 +75,19 @@
                     }
                     echo "</div>";
                 } else {
-                    $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date";
+                    $total_amount = 0;
+                    for ($x = 0; $x < $selected_product_count; $x++) {
+                        $amount =  ($products[$product_id[$x] - 1]['promotion_price'] != 0) ?  $products[$product_id[$x] - 1]['promotion_price'] * $quantity_array[$x] : $products[$product_id[$x] - 1]['price'] * $quantity_array[$x];
+
+                        $total_amount += $amount;
+                    }
+
+                    $summary_query = "INSERT INTO order_summary SET customer_id=:customer, order_date=:order_date, total_amount=:total_amount";
                     $order_date = date('Y-m-d H:i:s'); // get the current date and time
                     $summary_stmt = $con->prepare($summary_query);
                     $summary_stmt->bindParam(':customer', $customer);
                     $summary_stmt->bindParam(':order_date', $order_date);
+                    $summary_stmt->bindParam(":total_amount", $total_amount);
                     $summary_stmt->execute();
 
                     // order details
@@ -136,10 +147,6 @@
                             <select class="form-select" name="product[]"> <!-- array -->
                                 <option value=''>Select a product</option>;
                                 <?php
-                                $product_query = "SELECT id, name FROM products";
-                                $product_stmt = $con->prepare($product_query);
-                                $product_stmt->execute();
-                                $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 // Generate select options
                                 for ($i = 0; $i < count($products); $i++) {
                                     $product_selected = isset($_POST["product"]) && $products[$i]['id'] == $product_id[$x] ? "selected" : "";
