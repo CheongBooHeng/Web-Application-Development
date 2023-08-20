@@ -95,7 +95,13 @@
             </tr>
             <tr>
                 <td>Image</td>
-                <td><img src="uploads/<?php echo htmlspecialchars($image, ENT_QUOTES); ?>"></td>
+                <td><?php
+                        if ($image != "") {
+                            echo '<img src="uploads/' . htmlspecialchars($image, ENT_QUOTES) . '">';
+                        } else {
+                            echo '<img src="img/comingsoon.jpg" alt="image">';
+                        }
+                        ?></td>
             </tr>
             <tr>
                 <td></td>
