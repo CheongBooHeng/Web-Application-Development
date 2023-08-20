@@ -73,7 +73,7 @@
                 echo "<a href='order_update.php?id={$order_id}' class='btn btn-primary me-3'>Edit</a>";
 
                 // we will use this links on next part of this post
-                echo "<a href='#' onclick='delete_product({$order_id});'  class='btn btn-danger'>Delete</a>";
+                echo "<a href='#' onclick='delete_order({$order_id});'  class='btn btn-danger'>Delete</a>";
                 echo "</td>";
 
                 echo "</tr>";
@@ -90,7 +90,7 @@
 
     <script type='text/javascript'>
         // confirm record deletion
-        function delete_product(id) {
+        function delete_order(id) {
             if (confirm('Are you sure?')) {
                 // if user clicked ok,
                 // pass the id to delete.php and execute the delete query

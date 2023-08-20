@@ -36,6 +36,10 @@
             echo "<div class='alert alert-success'>Record was deleted.</div>";
         }
 
+        if ($action == 'failed') {
+            echo "<div class='alert alert-danger'>There are products inside this category.</div>";
+        }
+
         // select all data
         $search = isset($_GET['search']) ? $_GET['search'] : '';
         $query = "SELECT id, category_name, description FROM categories";
@@ -89,7 +93,7 @@
                 echo "<a href='categories_update.php?id={$id}' class='btn btn-primary me-3'>Edit</a>";
 
                 // we will use this links on next part of this post
-                echo "<a href='#' onclick='delete_product({$id});'  class='btn btn-danger'>Delete</a>";
+                echo "<a href='#' onclick='delete_categories({$id});'  class='btn btn-danger'>Delete</a>";
                 echo "</td>";
                 echo "</tr>";
             }
@@ -109,7 +113,7 @@
     <!-- confirm delete record will be here -->
     <script type='text/javascript'>
         // confirm record deletion
-        function delete_product(id) {
+        function delete_categories(id) {
             if (confirm('Are you sure?')) {
                 // if user clicked ok,
                 // pass the id to delete.php and execute the delete query

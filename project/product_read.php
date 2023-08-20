@@ -36,6 +36,10 @@
             echo "<div class='alert alert-success'>Record was deleted.</div>";
         }
 
+        if ($action == 'failed') {
+            echo "<div class='alert alert-danger'>This product has been ordered.</div>";
+        }
+
         // select all data
         $search = isset($_GET['search']) ? $_GET['search'] : '';
         $query = "SELECT id, name, description, price, promotion_price, category_name FROM products";
