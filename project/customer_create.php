@@ -116,8 +116,7 @@
                             $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
                             // error message is empty
                             $file_upload_error_messages = "";
-                        }
-                        // make sure that file is a real image
+                            // make sure that file is a real image
                         $check = getimagesize($_FILES["image"]["tmp_name"]);
                         if ($check !== false) {
                             // submitted file is an image
@@ -162,6 +161,7 @@
                             echo "<div>{$file_upload_error_messages}</div>";
                             echo "<div>Update the record to upload photo.</div>";
                             echo "</div>";
+                        }
                         }
                         $_POST = array();
                     } else {

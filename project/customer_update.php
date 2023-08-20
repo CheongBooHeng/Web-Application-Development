@@ -1,4 +1,4 @@
-<?php include "session.php"?>
+<?php include "session.php" ?>
 <!DOCTYPE HTML>
 <html>
 
@@ -28,7 +28,7 @@
         // read current record's data
         try {
             // prepare select query
-            $query = "SELECT id, username, password, firstname, lastname, gender, date_of_birth, account_status, email FROM customers WHERE id = ? LIMIT 0,1";
+            $query = "SELECT id, username, password, firstname, lastname, gender, date_of_birth, account_status, email, image FROM customers WHERE id = ? LIMIT 0,1";
             //0=offset 
             $stmt = $con->prepare($query);
 
@@ -50,6 +50,7 @@
             $date_of_birth = $row['date_of_birth'];
             $account_status = $row['account_status'];
             $email = $row['email'];
+            $image = $row['image'];
         }
 
         // show error
@@ -66,7 +67,7 @@
                 // in this case, it seemed like we have so many fields to pass and
                 // it is better to label them and not use question marks
                 $query = "UPDATE customers
-                SET username=:username, firstname=:firstname, lastname=:lastname, gender=:gender, date_of_birth=:date_of_birth, account_status=:account_status, email=:email";
+                SET username=:username, firstname=:firstname, lastname=:lastname, gender=:gender, date_of_birth=:date_of_birth, account_status=:account_status, email=:email, image=:image";
                 // prepare query for excecution
                 $stmt = $con->prepare($query);
                 // posted values
@@ -80,6 +81,11 @@
                 $date_of_birth = $_POST['date_of_birth'];
                 $account_status = $_POST['account_status'];
                 $email = htmlspecialchars(strip_tags($_POST['email']));
+                // new 'image' field
+                $image = !empty($_FILES["image"]["name"])
+                    ? sha1_file($_FILES['image']['tmp_name']) . "-" . basename($_FILES["image"]["name"])
+                    : "";
+                $image = htmlspecialchars(strip_tags($image));
 
                 $errors = array();
 
@@ -122,7 +128,7 @@
                     }
                 } else {
                     $hashed_password = $password;
-                }                
+                }
 
                 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $errors[] = "Invalid Email format.";
@@ -152,9 +158,65 @@
                     $stmt->bindParam(':date_of_birth', $date_of_birth);
                     $stmt->bindParam(':account_status', $account_status);
                     $stmt->bindParam(':email', $email);
+                    $stmt->bindParam(':image', $image);
                     // Execute the query
                     if ($stmt->execute()) {
                         echo "<div class='alert alert-success'>Record was updated.</div>";
+                        // now, if image is not empty, try to upload the image
+                        if ($image) {
+                            // upload to file to folder
+                            $target_directory = "uploads/";
+                            $target_file = $target_directory . $image;
+                            $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
+                            // error message is empty
+                            $file_upload_error_messages = "";
+                        }
+                        // make sure that file is a real image
+                        $check = getimagesize($_FILES["image"]["tmp_name"]);
+                        if ($check !== false) {
+                            // submitted file is an image
+                        } else {
+                            $file_upload_error_messages .= "<div>Submitted file is not an image.</div>";
+                        }
+                        // make sure certain file types are allowed
+                        $allowed_file_types = array("jpg", "jpeg", "png", "gif");
+                        if (!in_array($file_type, $allowed_file_types)) {
+                            $file_upload_error_messages .= "<div>Only JPG, JPEG, PNG, GIF files are allowed.</div>";
+                        }
+                        // make sure file does not exist
+                        if (file_exists($target_file)) {
+                            $file_upload_error_messages = "<div>Image already exists. Try to change file name.</div>";
+                        }
+                        // make sure submitted file is not too large, can't be larger than 1 MB
+                        if ($_FILES['image']['size'] > (1024000)) {
+                            $file_upload_error_messages .= "<div>Image must be less than 1 MB in size.</div>";
+                        }
+                        // make sure the 'uploads' folder exists
+                        // if not, create it
+                        if (!is_dir($target_directory)) {
+                            mkdir($target_directory, 0777, true);
+                        }
+                        // if $file_upload_error_messages is still empty
+                        if (empty($file_upload_error_messages)) {
+                            // it means there are no errors, so try to upload the file
+                            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                                // it means photo was uploaded
+                            } else {
+                                echo "<div class='alert alert-danger'>";
+                                echo "<div>Unable to upload photo.</div>";
+                                echo "<div>Update the record to upload photo.</div>";
+                                echo "</div>";
+                            }
+                        }
+
+                        // if $file_upload_error_messages is NOT empty
+                        else {
+                            // it means there are some errors, so show them to user
+                            echo "<div class='alert alert-danger'>";
+                            echo "<div>{$file_upload_error_messages}</div>";
+                            echo "<div>Update the record to upload photo.</div>";
+                            echo "</div>";
+                        }
                     } else {
                         echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
                     }
@@ -169,7 +231,7 @@
 
 
         <!-- HTML form to update record will be here -->
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . "?id={$id}"); ?>" method="post">
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . "?id={$id}"); ?>" method="post" enctype="multipart/form-data">
             <table class='table table-hover table-responsive table-bordered'>
                 <tr>
                     <td>Username</td>
@@ -229,10 +291,24 @@
                     <td><input type='email' name='email' value="<?php echo htmlspecialchars($email, ENT_QUOTES);  ?>" class='form-control' /></td>
                 </tr>
                 <tr>
+                    <td>Photo</td>
+                    <td>
+                        <?php
+                        if ($image != "") {
+                            echo '<img src="uploads/' . htmlspecialchars($image, ENT_QUOTES) . '">';
+                        } else {
+                            echo '<img src="img/profile.jpeg" alt="image">';
+                        }
+                        ?>
+                        <br>
+                        <input type="file" class="mt-2" name="image" class="form-control-file">
+                    </td>
+                </tr>
+                <tr>
                     <td></td>
                     <td>
                         <input type='submit' value='Save Changes' class='btn btn-primary' />
-                        <a href='product_read.php' class='btn btn-danger'>Back to read products</a>
+                        <a href='customer_read.php' class='btn btn-danger'>Back to read customers</a>
                     </td>
                 </tr>
             </table>
