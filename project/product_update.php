@@ -258,7 +258,7 @@
                         }
                         ?>
                         <br>
-                        <input type="file" name="image" class="form-control-file">
+                        <input type="file" class="mt-2" name="image" class="form-control-file">
                     </td>
                 </tr>
 
