@@ -1,4 +1,4 @@
-<?php include "session.php"?>
+<?php include "session.php" ?>
 <!DOCTYPE HTML>
 <html>
 
@@ -25,12 +25,6 @@
             // include database connection
             include 'config/database.php';
             try {
-                // insert query
-                // 准备 然后send去execution
-                $query = "INSERT INTO customers SET username=:username, password=:password, firstname=:firstname, lastname=:lastname, 
-                gender=:gender, date_of_birth=:date_of_birth, registration_date_time=:registration_date_time, account_status=:account_status, email=:email, image=:image";
-                // prepare query for execution
-                $stmt = $con->prepare($query);
                 $username = $_POST['username'];
                 $password = $_POST['password'];
                 $confirmpassword = $_POST['confirmpassword'];
@@ -93,30 +87,15 @@
                     }
                     echo "</div>";
                 } else {
-                    $stmt->bindParam(':username', $username);
-                    $stmt->bindParam(':password', $hashed_password);
-                    $stmt->bindParam(':firstname', $firstname);
-                    $stmt->bindParam(':lastname', $lastname);
-                    $stmt->bindParam(':email', $email);
-                    $stmt->bindParam(':gender', $gender);
-                    $registration_date_time = date('Y-m-d H:i:s'); // get the current date and time
-                    $stmt->bindParam(':registration_date_time', $registration_date_time);
-                    $stmt->bindParam(':date_of_birth', $date_of_birth);
-                    $stmt->bindParam(':account_status', $account_status);
-                    $stmt->bindParam(':image', $image);
-
-                    // Execute the query
-                    if ($stmt->execute()) {
-                        echo "<div class='alert alert-success'>Record was saved.</div>";
-                        // now, if image is not empty, try to upload the image
-                        if ($image) {
-                            // upload to file to folder
-                            $target_directory = "uploads/";
-                            $target_file = $target_directory . $image;
-                            $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
-                            // error message is empty
-                            $file_upload_error_messages = "";
-                            // make sure that file is a real image
+                    // now, if image is not empty, try to upload the image
+                    if ($image) {
+                        // upload to file to folder
+                        $target_directory = "uploads/";
+                        $target_file = $target_directory . $image;
+                        $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
+                        // error message is empty
+                        $file_upload_error_messages = "";
+                        // make sure that file is a real image
                         $check = getimagesize($_FILES["image"]["tmp_name"]);
                         if ($check !== false) {
                             // submitted file is an image
@@ -162,7 +141,28 @@
                             echo "<div>Update the record to upload photo.</div>";
                             echo "</div>";
                         }
-                        }
+                    }
+                    // insert query
+                    // 准备 然后send去execution
+                    $query = "INSERT INTO customers SET username=:username, password=:password, firstname=:firstname, lastname=:lastname, 
+                gender=:gender, date_of_birth=:date_of_birth, registration_date_time=:registration_date_time, account_status=:account_status, email=:email, image=:image";
+                    // prepare query for execution
+                    $stmt = $con->prepare($query);
+                    $stmt->bindParam(':username', $username);
+                    $stmt->bindParam(':password', $hashed_password);
+                    $stmt->bindParam(':firstname', $firstname);
+                    $stmt->bindParam(':lastname', $lastname);
+                    $stmt->bindParam(':email', $email);
+                    $stmt->bindParam(':gender', $gender);
+                    $registration_date_time = date('Y-m-d H:i:s'); // get the current date and time
+                    $stmt->bindParam(':registration_date_time', $registration_date_time);
+                    $stmt->bindParam(':date_of_birth', $date_of_birth);
+                    $stmt->bindParam(':account_status', $account_status);
+                    $stmt->bindParam(':image', $image);
+
+                    // Execute the query
+                    if ($stmt->execute()) {
+                        echo "<div class='alert alert-success'>Record was saved.</div>";
                         $_POST = array();
                     } else {
                         echo "<div class='alert alert-danger'>Unable to save record.</div>";

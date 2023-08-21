@@ -6,8 +6,9 @@ try {
     // isset() is a PHP function used to verify if a value is there or not
     $id=isset($_GET['id']) ? $_GET['id'] :  die('ERROR: Record ID not found.');
 
-    $exists_query = "SELECT id FROM categories WHERE EXISTS (SELECT category_name FROM products WHERE products.category_name = categories.category_name)";
+    $exists_query = "SELECT COUNT(*) FROM products WHERE category_name = ?";
     $exists_stmt = $con->prepare($exists_query);
+    $exists_stmt->bindParam(1, $id);
     $exists_stmt->execute();
     $categories = $exists_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -15,11 +16,7 @@ try {
     $query = "DELETE FROM categories WHERE id = ?";
     $stmt = $con->prepare($query);
     $stmt->bindParam(1, $id);
-    for ($i = 0; $i < count($categories); $i++) {
-        if ($id == $categories[$i]['id'])
-            $error = 1;
-    }
-    if (isset($error)) {
+    if ($categories > 0 ) {
         header("Location: categories_read.php?action=failed");
     } else if($stmt->execute()){
         // redirect to read records page and
