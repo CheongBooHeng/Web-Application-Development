@@ -112,7 +112,7 @@
                     </p>
                 </div>
             </div>
-            <h2 class="pt-3">An Overview of Our Product</h2>
+            <h2 class="p-3 m-0 text-center bg-body-tertiary">An Overview of Our Product</h2>
             <div class="row m-auto gap-3">
                 <div class="col border border-3 shadow p-5 text-center rounded">
                     <h2 class="mb-3">Top 5 Selling Products</h2>
