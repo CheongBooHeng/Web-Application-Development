@@ -4,41 +4,44 @@ include 'config/database.php';
 try {     
     // get record ID
     // isset() is a PHP function used to verify if a value is there or not
-    $id=isset($_GET['id']) ? $_GET['id'] :  die('ERROR: Record ID not found.');
+    $id = isset($_GET['id']) ? $_GET['id'] :  die('ERROR: Record ID not found.');
 
-    $exists_query = "SELECT id FROM products WHERE EXISTS (SELECT product_id FROM order_details WHERE order_details.product_id = products.id)";
+    // Check if there are associated order details
+    $exists_query = "SELECT COUNT(*) FROM order_details WHERE product_id = ?";
     $exists_stmt = $con->prepare($exists_query);
+    $exists_stmt->bindParam(1, $id); // Bind the parameter
     $exists_stmt->execute();
-    $products = $exists_stmt->fetchAll(PDO::FETCH_ASSOC);
+    $count = $exists_stmt->fetchColumn(); // Fetch the count directly
 
+    if ($count > 0) {
+        header("Location: product_read.php?action=failed");
+        exit; // Terminate the script
+    }
+
+    // Fetch the image filename
     $image_query = "SELECT image FROM products WHERE id=?";
     $image_stmt = $con->prepare($image_query);
     $image_stmt->bindParam(1, $id);
     $image_stmt->execute();
     $image = $image_stmt->fetch(PDO::FETCH_ASSOC);
 
-    // delete query
-    $query = "DELETE FROM products WHERE id = ?";
-    $stmt = $con->prepare($query);
-    $stmt->bindParam(1, $id);
-    for ($i = 0; $i < count($products); $i++) {
-        if ($id == $products[$i]['id'])
-            $error = 1;
-    }
-    if (isset($error)) {
-        header("Location: product_read.php?action=failed");
-    } else if($stmt->execute()){
+    // Delete query
+    $delete_query = "DELETE FROM products WHERE id = ?";
+    $delete_stmt = $con->prepare($delete_query);
+    $delete_stmt->bindParam(1, $id);
+
+    // Execute the delete query
+    if ($delete_stmt->execute()) {
         unlink("uploads/" . $image['image']);
-        // redirect to read records page and
-        // tell the user record was deleted
+        // Redirect to read records page and tell the user record was deleted
         header('Location: product_read.php?action=deleted');
-    }else{
+        exit; // Terminate the script
+    } else {
         die('Unable to delete record.');
     }
-}
-// show error
-catch(PDOException $exception){
-    echo "<div class = 'alert alert-danger'>";
+} catch (PDOException $exception) {
+    echo "<div class='alert alert-danger'>";
     echo $exception->getMessage();
-    echo "</div>";
+    echo"</div>";
 }
+?>

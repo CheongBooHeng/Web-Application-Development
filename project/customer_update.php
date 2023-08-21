@@ -167,6 +167,7 @@
                             // upload to file to folder
                             $target_directory = "uploads/";
                             $target_file = $target_directory . $image;
+                            //pathinfo找是不是.jpg,.png
                             $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
                             // error message is empty
                             $file_upload_error_messages = "";
