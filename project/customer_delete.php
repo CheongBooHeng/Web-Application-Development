@@ -13,6 +13,12 @@ try {
     $exists_stmt->execute();
     $customers = $exists_stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    $image_query = "SELECT image FROM customers WHERE id=?";
+    $image_stmt = $con->prepare($image_query);
+    $image_stmt->bindParam(1, $id);
+    $image_stmt->execute();
+    $image = $image_stmt->fetch(PDO::FETCH_ASSOC);
+
     // delete query
     $query = "DELETE FROM customers WHERE id = ?";
     $stmt = $con->prepare($query);
@@ -24,6 +30,7 @@ try {
     if (isset($error)) {
         header("Location: customer_read.php?action=failed");
     } else if($stmt->execute()){
+        unlink("uploads/" . $image['image']);
         // redirect to read records page and
         // tell the user record was deleted
         header('Location: customer_read.php?action=deleted');
