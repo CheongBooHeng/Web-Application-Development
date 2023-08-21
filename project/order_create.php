@@ -77,7 +77,13 @@
                 } else {
                     $total_amount = 0;
                     for ($x = 0; $x < $selected_product_count; $x++) {
-                        $amount =  ($products[$product_id[$x] - 1]['promotion_price'] != 0) ?  $products[$product_id[$x] - 1]['promotion_price'] * $quantity_array[$x] : $products[$product_id[$x] - 1]['price'] * $quantity_array[$x];
+                        $price_query = "SELECT * FROM products WHERE id=?";
+                        $price_stmt = $con->prepare($price_query);
+                        $price_stmt->bindParam(1, $product_id[$x]);
+                        $price_stmt->execute();
+                        $prices = $price_stmt->fetch(PDO::FETCH_ASSOC);
+
+                        $amount =  ($prices['promotion_price'] != 0) ?  $prices['promotion_price'] * $quantity_array[$x] : $prices['price'] * $quantity_array[$x];
 
                         $total_amount += $amount;
                     }

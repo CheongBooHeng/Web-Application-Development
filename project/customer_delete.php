@@ -6,10 +6,11 @@ try {
     // isset() is a PHP function used to verify if a value is there or not
     $id=isset($_GET['id']) ? $_GET['id'] :  die('ERROR: Record ID not found.');
 
-    $exists_query = "SELECT id FROM customers WHERE EXISTS (SELECT customer_id FROM order_summary WHERE order_summary.customer_id = customers.id)";
+    $exists_query = "SELECT COUNT(*) FROM order_summary WHERE customer_id = ?";
     $exists_stmt = $con->prepare($exists_query);
+    $exists_stmt->bindParam(1, $id);
     $exists_stmt->execute();
-    $customers = $exists_stmt->fetchAll(PDO::FETCH_ASSOC);
+    $customers = $exists_stmt->fetchColumn();
 
     $image_query = "SELECT image FROM customers WHERE id=?";
     $image_stmt = $con->prepare($image_query);
@@ -21,11 +22,7 @@ try {
     $query = "DELETE FROM customers WHERE id = ?";
     $stmt = $con->prepare($query);
     $stmt->bindParam(1, $id);
-    for ($i = 0; $i < count($customers); $i++) {
-        if ($id == $customers[$i]['id'])
-            $error = 1;
-    }
-    if (isset($error)) {
+    if ($customers > 0 ) {
         header("Location: customer_read.php?action=failed");
     } else if($stmt->execute()){
         unlink("uploads/" . $image['image']);
