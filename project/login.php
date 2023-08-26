@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (isset($_SESSION["customer_id"])){
+if (isset($_SESSION["customer_id"])) {
     header("Location: index.php");
     exit();
 }
@@ -14,6 +14,15 @@ if (isset($_SESSION["customer_id"])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <title>Log In</title>
+    <style>
+        body {
+            background-image: url(img/login_bg.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,25 +30,15 @@ if (isset($_SESSION["customer_id"])){
         <?php
         include 'config/database.php';
 
-        
         if ($_POST) {
             $username_email = $_POST['username_email'];
             $password = $_POST['password'];
 
-            $errors = array();
-
             if (empty($username_email)) {
-                $errors[] = "Username/Email is required.";
+                $user_input = "Username/Email is required.";
             }
             if (empty($password)) {
-                $errors[] = "Password is required.";
-            }
-            if (!empty($errors)) {
-                echo "<div class='alert alert-danger'>";
-                foreach ($errors as $error) {
-                    echo "<p class='error-message'>$error</p>";
-                }
-                echo "</div>";
+                $password_input = "Password is required.";
             } else {
                 try {
                     $query = "SELECT id, username, password, email,account_status FROM customers WHERE username=:username_email OR email=:username_email";
@@ -65,19 +64,9 @@ if (isset($_SESSION["customer_id"])){
                             }
                         } else {
                             $error = "Incorrect password.";
-                            echo "<div class='alert alert-danger'>";
-
-                            echo "<p class='error-message'>$error</p>";
-
-                            echo "</div>";
                         }
                     } else {
                         $error = "Username/Email Not Found.";
-                        echo "<div class='alert alert-danger'>";
-
-                        echo "<p class='error-message'>$error</p>";
-
-                        echo "</div>";
                     }
                 } catch (PDOException $exception) {
                     $error = $exception->getMessage();
@@ -87,20 +76,27 @@ if (isset($_SESSION["customer_id"])){
 
 
         ?>
-        <form action="" method="POST" class="border border-3 p-3 rounded w-50 m-auto">
-            <h5 class="text-center">Welcome!</h5>
-            <div class="form-floating mb-3 ">
-                <input type="text" class="form-control" name="username_email" id="username_email" placeholder="name@example.com">
-                <label for="username_email">Username/Email</label>
+        <div class="row align-items-center m-auto position-absolute top-50 start-50 translate-middle w-75">
+            <div class="col text-center">
+                <img src="img/logo.png" alt="EcoMart">
             </div>
-            <div class="form-floating mb-3">
-                <input type="password" class="form-control" name="password" id="password" placeholder="Password">
-                <label for="password">Password</label>
-            </div>
-            <div class="button">
-                <button class="btn btn-outline-success" type="submit">Log in</button>
-            </div>
-        </form>
+            <form action="" method="POST" class="col border border-2 border-dark rounded p-4 bg-white">
+                <div class="form mb-3 ">
+                    <label for="username_email">Username/Email</label>
+                    <input type="text" class="form-control w-100 " name="username_email" id="username_email">
+                    <span class="text-danger"> <?php echo isset($user_input) ? $user_input : '';  ?></span>
+                </div>
+                <div class="form mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control w-100" name="password" id="password">
+                    <span class="text-danger"> <?php echo isset($password_input) ? $password_input : '';  ?></span>
+                </div>
+                <div class="button">
+                    <button class="btn btn-outline-success text-center w-100" type="submit">Log in</button>
+                </div>
+                <span class="text-danger"><?php echo isset($error) ? $error : ''; ?></span>
+            </form>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>

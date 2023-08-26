@@ -67,11 +67,10 @@
                 // in this case, it seemed like we have so many fields to pass and
                 // it is better to label them and not use question marks
                 $query = "UPDATE customers
-                SET username=:username, firstname=:firstname, lastname=:lastname, gender=:gender, date_of_birth=:date_of_birth, account_status=:account_status, email=:email, image=:image";
+                SET firstname=:firstname, lastname=:lastname, gender=:gender, date_of_birth=:date_of_birth, account_status=:account_status, email=:email, image=:image";
                 // prepare query for excecution
                 $stmt = $con->prepare($query);
                 // posted values
-                $username = htmlspecialchars(strip_tags($_POST['username'])); //改
                 $oldpassword = $_POST['oldpassword'];
                 $newpassword = $_POST['newpassword'];
                 $confirmpassword = $_POST['confirmpassword'];
@@ -86,8 +85,40 @@
                     ? sha1_file($_FILES['image']['tmp_name']) . "-" . basename($_FILES["image"]["name"])
                     : "";
                 $image = htmlspecialchars(strip_tags($image));
-
+                // upload to file to folder
+                $target_directory = "uploads/";
+                $target_file = $target_directory . $image;
+                //pathinfo找是不是.jpg,.png
+                $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
                 $errors = array();
+
+                // now, if image is not empty, try to upload the image
+                if ($image) {
+                    $check = getimagesize($_FILES["image"]["tmp_name"]);
+                    $image_width = $check[0];
+                    $image_height = $check[1];
+                    if ($image_width != $image_height) {
+                        $errors[] = "Only square size image allowed.";
+                    }
+                    // make sure submitted file is not too large, can't be larger than 1 MB
+                    if ($_FILES['image']['size'] > (524288)) {
+                        $errors []= "<div>Image must be less than 512 KB in size.</div>";
+                    }
+                    if ($check == false) {
+                        // make sure that file is a real image
+                        $errors []= "<div>Submitted file is not an image.</div>";
+                    }
+                    // make sure certain file types are allowed
+                    $allowed_file_types = array("jpg", "jpeg", "png", "gif");
+                    if (!in_array($file_type, $allowed_file_types)) {
+                        $errors []= "<div>Only JPG, JPEG, PNG, GIF files are allowed.</div>";
+                    }
+                    // make sure file does not exist
+                    if (file_exists($target_file)) {
+                        $errors []= "<div>Image already exists. Try to change file name.</div>";
+                    }
+                }
+
 
 
                 //check 新pw format, newpw=cpw一样不一样, oldpw, oldpw==newpw
@@ -148,7 +179,6 @@
                     $stmt = $con->prepare($query);
                     // bind the parameters
                     $stmt->bindParam(':id', $id);
-                    $stmt->bindParam(':username', $username);
                     if (isset($hashed_password)) {
                         $stmt->bindParam(':password', $hashed_password);
                     }
@@ -162,61 +192,39 @@
                     // Execute the query
                     if ($stmt->execute()) {
                         echo "<div class='alert alert-success'>Record was updated.</div>";
-                        // now, if image is not empty, try to upload the image
-                        if ($image) {
-                            // upload to file to folder
-                            $target_directory = "uploads/";
-                            $target_file = $target_directory . $image;
-                            //pathinfo找是不是.jpg,.png
-                            $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
-                            // error message is empty
-                            $file_upload_error_messages = "";
-                        }
-                        // make sure that file is a real image
-                        $check = getimagesize($_FILES["image"]["tmp_name"]);
-                        if ($check !== false) {
-                            // submitted file is an image
-                        } else {
-                            $file_upload_error_messages .= "<div>Submitted file is not an image.</div>";
-                        }
-                        // make sure certain file types are allowed
-                        $allowed_file_types = array("jpg", "jpeg", "png", "gif");
-                        if (!in_array($file_type, $allowed_file_types)) {
-                            $file_upload_error_messages .= "<div>Only JPG, JPEG, PNG, GIF files are allowed.</div>";
-                        }
-                        // make sure file does not exist
-                        if (file_exists($target_file)) {
-                            $file_upload_error_messages = "<div>Image already exists. Try to change file name.</div>";
-                        }
-                        // make sure submitted file is not too large, can't be larger than 1 MB
-                        if ($_FILES['image']['size'] > (1024000)) {
-                            $file_upload_error_messages .= "<div>Image must be less than 1 MB in size.</div>";
-                        }
                         // make sure the 'uploads' folder exists
                         // if not, create it
-                        if (!is_dir($target_directory)) {
-                            mkdir($target_directory, 0777, true);
-                        }
-                        // if $file_upload_error_messages is still empty
-                        if (empty($file_upload_error_messages)) {
-                            // it means there are no errors, so try to upload the file
-                            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-                                // it means photo was uploaded
-                            } else {
+                        if ($image) {
+                            if ($target_file != $row['image'] && $row['image'] != "") {
+                                unlink($row['image']);
+                            }
+
+                            // make sure the 'uploads' folder exists
+                            // if not, create it
+                            if (!is_dir($target_directory)) {
+                                mkdir($target_directory, 0777, true);
+                            }
+                            // if $file_upload_error_messages is still empty
+                            if (empty($file_upload_error_messages)) {
+                                // it means there are no errors, so try to upload the file
+                                if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                                    // it means photo was uploaded
+                                } else {
+                                    echo "<div class='alert alert-danger'>";
+                                    echo "<div>Unable to upload photo.</div>";
+                                    echo "<div>Update the record to upload photo.</div>";
+                                    echo "</div>";
+                                }
+                            }
+
+                            // if $file_upload_error_messages is NOT empty
+                            else {
+                                // it means there are some errors, so show them to user
                                 echo "<div class='alert alert-danger'>";
-                                echo "<div>Unable to upload photo.</div>";
+                                echo "<div>{$file_upload_error_messages}</div>";
                                 echo "<div>Update the record to upload photo.</div>";
                                 echo "</div>";
                             }
-                        }
-
-                        // if $file_upload_error_messages is NOT empty
-                        else {
-                            // it means there are some errors, so show them to user
-                            echo "<div class='alert alert-danger'>";
-                            echo "<div>{$file_upload_error_messages}</div>";
-                            echo "<div>Update the record to upload photo.</div>";
-                            echo "</div>";
                         }
                     } else {
                         echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
@@ -236,7 +244,7 @@
             <table class='table table-hover table-responsive table-bordered'>
                 <tr>
                     <td>Username</td>
-                    <td><input type='text' name='username' value="<?php echo htmlspecialchars($username, ENT_QUOTES);  ?>" class='form-control' /></td>
+                    <td><?php echo htmlspecialchars($username, ENT_QUOTES);  ?></td>
                 </tr>
                 <tr>
                     <td>Old Password</td>
