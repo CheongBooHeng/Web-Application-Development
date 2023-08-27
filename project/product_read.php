@@ -72,7 +72,7 @@
             echo "<th>ID</th>";
             echo "<th>Name</th>";
             echo "<th>Description</th>";
-            echo "<th>Price</th>";
+            echo "<th class='text-end'>Price</th>";
             echo "<th>Category</th>";
             echo "<th>Image</th>";
             echo "<th>Action</th>";

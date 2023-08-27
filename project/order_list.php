@@ -34,12 +34,12 @@
         }
 
         $search = isset($_GET['search']) ? $_GET['search'] : '';
-        $query = "SELECT order_summary.order_id, customers.firstname, customers.lastname, order_summary.order_date FROM order_summary INNER JOIN customers ON order_summary.customer_id = customers.id";
+        $query = "SELECT order_summary.order_id, customers.username, order_summary.order_date FROM order_summary INNER JOIN customers ON order_summary.customer_id = customers.id";
         if (!empty($search)) {
-            $query .= " WHERE customers.firstname LIKE :keyword OR customers.lastname LIKE :keyword";
+            $query .= " WHERE customers.username LIKE :keyword";
             $search = "%{$search}%";
         }
-        $query .= " ORDER BY id ASC";
+        $query .= " ORDER BY order_summary.order_id DESC";
         $stmt = $con->prepare($query);
         if (!empty($search)) {
             $stmt->bindParam(':keyword', $search);
@@ -63,11 +63,9 @@
                 extract($row);
                 echo "<tr>";
                 echo "<td>{$order_id}</td>";
-                echo "<td>{$firstname} {$lastname}</td>";
+                echo "<td><a href='order_detail_read.php?id={$order_id}' class='link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-dark link-dark'>{$username}</a></td>";
                 echo "<td>{$order_date}</td>";
                 echo "<td>";
-                // read one record
-                echo "<a href='order_detail_read.php?id={$order_id}' class='btn btn-info me-3'>Read</a>";
 
                 // we will use this links on next part of this post
                 echo "<a href='order_update.php?id={$order_id}' class='btn btn-primary me-3'>Edit</a>";

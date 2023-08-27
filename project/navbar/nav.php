@@ -6,14 +6,14 @@ if (isset($_GET['logout'])) {
 }
 ?>
 
-<nav class="navbar navbar-expand-lg bg-info">
-    <a class="navbar-brand ms-3" href="index.php">
-        <img src="img/logo.png" alt="EcoMart" width="70" class="d-inline-block align-text-top">
+<nav class="navbar navbar-expand-lg bg-info rounded-bottom py-0">
+    <a class="navbar-brand ms-2" href="index.php">
+        <img src="img/index_logo.png" alt="EcoMart" width="170" class="d-inline-block align-text-top">
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse justify-content-end me-3 ms-3" id="navbarNav">
+    <div class="collapse navbar-collapse justify-content-end me-3 ms-3 link-dark" id="navbarNav">
         <ul class="navbar-nav">
             <li class="nav-item">
                 <a class="nav-link" href="index.php">Home</a>

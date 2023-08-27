@@ -76,9 +76,9 @@ if (isset($_SESSION["customer_id"])) {
 
 
         ?>
-        <div class="row align-items-center m-auto position-absolute top-50 start-50 translate-middle w-75">
+        <div class="container row align-items-center m-auto position-absolute top-50 start-50 translate-middle w-75">
             <div class="col text-center">
-                <img src="img/logo.png" alt="EcoMart">
+                <img src="img/login_logo.png" alt="EcoMart" width="300" class="rounded">
             </div>
             <form action="" method="POST" class="col border border-2 border-dark rounded p-4 bg-white">
                 <div class="form mb-3 ">

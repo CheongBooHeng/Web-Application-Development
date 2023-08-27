@@ -24,12 +24,25 @@
         $stmt->execute();
         $num = $stmt->rowCount();
 
+        $customerQuery = "SELECT order_summary.order_date, customers.firstname, customers.lastname FROM order_details INNER JOIN order_summary ON order_details.order_id = order_summary.order_id INNER JOIN customers ON order_summary.customer_id = customers.id WHERE order_details.order_id = :id ORDER BY order_details.orderdetail_id ASC";
+        $customerStmt = $con->prepare($customerQuery);
+        $customerStmt->bindParam(":id", $id);
+        $customerStmt->execute();
+        $customerRow = $customerStmt->fetch(PDO::FETCH_ASSOC);
+        $firstname = $customerRow['firstname'];
+        $lastname = $customerRow['lastname'];
+        $orderdatetime = $customerRow['order_date'];
+
         if ($num > 0) {
             $totalamount = 0;
 
-            echo "<p>Username: $username</p>";
+
             echo "<table class='table table-hover table-responsive table-bordered'>";
             echo "<tr>";
+            echo "<div class='pt-2 d-flex justify-content-between'>";
+            echo "<p>Customer Name: " . $firstname . " " . $lastname . "</p>";
+            echo "<p>Order Date: " . $orderdatetime . "</p>";
+            echo "</div>";
             echo "<th>Product Name</th>";
             echo "<th class='text-end'>Price</th>";
             echo "<th>Quantity</th>";

@@ -1,4 +1,4 @@
-<?php include "session.php"?>
+<?php include "session.php" ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -64,9 +64,7 @@
 
                 if ($customer == "") {
                     $errors[] = "Please choose your username.";
-                }
-
-                if ($status['account_status'] == "Inactive") {
+                }else if ($status['account_status'] == "Inactive") {
                     $errors[] = "Inactive account can't make a order";
                 }
 
@@ -115,15 +113,15 @@
                     $order_id = $con->lastInsertId();
 
                     for ($i = 0; $i < $selected_product_count; $i++) {
-                    $details_query = "INSERT INTO order_details SET order_id=:order_id, product_id=:product_id, quantity=:quantity";
-                    $details_stmt = $con->prepare($details_query);
+                        $details_query = "INSERT INTO order_details SET order_id=:order_id, product_id=:product_id, quantity=:quantity";
+                        $details_stmt = $con->prepare($details_query);
                         $details_stmt->bindParam(':order_id', $order_id);
                         // 这边叫出来每个
                         $details_stmt->bindParam(':product_id', $product_id[$i]);
                         $details_stmt->bindParam(':quantity', $quantity_array[$i]);
                         $details_stmt->execute();
                     }
-                    echo "<div class='alert alert-success'>Order successfully.</div>";
+                    echo "<script>window.location.href = 'order_detail_read.php?id={$order_id}&action=create_order_successfully';</script>";
                     $_POST = array();
                 }
             } catch (PDOException $exception) {
@@ -156,7 +154,7 @@
                 for ($x = 0; $x < $product_keep; $x++) {
                 ?>
                     <tr class="pRow">
-                    <td class="text-center"><?php echo $x+1?></td>
+                        <td class="text-center"><?php echo $x + 1 ?></td>
                         <td class="d-flex">
                             <select class="form-select" name="product[]"> <!-- array -->
                                 <option value=''>Select a product</option>;
