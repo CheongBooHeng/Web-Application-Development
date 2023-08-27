@@ -37,15 +37,16 @@
                     ? sha1_file($_FILES['image']['tmp_name']) . "-" . basename($_FILES["image"]["name"])
                     : "";
                 $image = htmlspecialchars(strip_tags($image));
-                // upload to file to folder
-                $target_directory = "uploads/";
-                $target_file = $target_directory . $image;
-                //pathinfo找是不是.jpg,.png
-                $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
+                $target_file = '';
                 $errors = array();
 
                 // now, if image is not empty, try to upload the image
                 if ($image) {
+                    // upload to file to folder
+                    $target_directory = "uploads/";
+                    $target_file = $target_directory . $image;
+                    //pathinfo找是不是.jpg,.png
+                    $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
                     $check = getimagesize($_FILES["image"]["tmp_name"]);
                     $image_width = $check[0];
                     $image_height = $check[1];
@@ -118,7 +119,7 @@
                     $stmt->bindParam(':name', $name);
                     $stmt->bindParam(':description', $description);
                     $stmt->bindParam(':price', $price);
-                    $stmt->bindParam(':image', $image);
+                    $stmt->bindParam(':image', $target_file);
                     $created = date('Y-m-d H:i:s'); // get the current date and time
                     $stmt->bindParam(':created', $created);
                     $stmt->bindParam(':promotion', $promotion);
@@ -132,10 +133,6 @@
                         // make sure the 'uploads' folder exists
                         // if not, create it
                         if ($image) {
-                            if ($target_file != $row['image'] && $row['image'] != "") {
-                                unlink($row['image']);
-                            }
-
                             // make sure the 'uploads' folder exists
                             // if not, create it
                             if (!is_dir($target_directory)) {

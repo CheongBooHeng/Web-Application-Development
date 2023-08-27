@@ -188,7 +188,11 @@
                     $stmt->bindParam(':date_of_birth', $date_of_birth);
                     $stmt->bindParam(':account_status', $account_status);
                     $stmt->bindParam(':email', $email);
-                    $stmt->bindParam(':image', $image);
+                    if ($image == "") {
+                        $stmt->bindParam(":image", $row['image']);
+                    } else {
+                        $stmt->bindParam(':image', $target_file);
+                    }
                     // Execute the query
                     if ($stmt->execute()) {
                         echo "<div class='alert alert-success'>Record was updated.</div>";
@@ -226,6 +230,7 @@
                                 echo "</div>";
                             }
                         }
+                        header("Location: customer_read_one.php?id={$id}");
                     } else {
                         echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
                     }
@@ -308,7 +313,7 @@
                     <td>
                         <?php
                         if ($image != "") {
-                            echo '<img src="uploads/' . ($image) . '"width="100">';
+                            echo '<img src="' . htmlspecialchars($image, ENT_QUOTES) . '"width="100">';
                         } else {
                             echo '<img src="img/profile.jpeg" alt="image" width="100">';
                         }

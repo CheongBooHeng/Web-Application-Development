@@ -87,7 +87,7 @@
                 // creating new table row per record
                 echo "<tr>";
                 echo "<td>{$id}</td>";
-                echo "<td>{$name}</td>";
+                echo "<td><a href='product_read_one.php?id={$id}' class='link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-dark link-dark'>{$name}</a></td>";
                 echo "<td>{$description}</td>";
                 echo "<td class='text-end'>";
                 if (!empty($promotion_price)) {
@@ -101,13 +101,11 @@
                 echo "</td>";
                 echo "<td>{$category_name}</td>";
                 if ($image != "") {
-                    echo '<td><img src="uploads/' . htmlspecialchars($image, ENT_QUOTES) . '"width="100"></td>';
+                    echo '<td><img src="' . htmlspecialchars($image, ENT_QUOTES) . '"width="100"></td>';
                 } else {
                     echo '<td><img src="img/comingsoon.jpg" alt="image" width="100"></td>';
                 }
                 echo "<td>";
-                // read one record
-                echo "<a href='product_read_one.php?id={$id}' class='btn btn-info me-3'>Read</a>";
 
                 // we will use this links on next part of this post
                 echo "<a href='product_update.php?id={$id}' class='btn btn-primary me-3'>Edit</a>";

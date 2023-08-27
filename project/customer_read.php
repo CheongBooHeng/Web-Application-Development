@@ -61,7 +61,7 @@
         $num = $stmt->rowCount();
 
         // link to create record form
-        echo "<a href='create_customer.php' class='btn btn-primary mb-3'>Create New Customers</a>";
+        echo "<a href='customer_create.php' class='btn btn-primary mb-3'>Create New Customers</a>";
 
         //check if more than 0 record found
         if ($num > 0) {
@@ -89,18 +89,16 @@
                 // creating new table row per record
                 echo "<tr>";
                 echo "<td>{$id}</td>";
-                echo "<td>{$username}</td>";
+                echo "<td><a href='customer_read_one.php?id={$id}' class='link-offset-2 link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover text-dark link-dark'>{$username}</a></td>";
                 echo "<td>{$firstname}</td>";
                 echo "<td>{$lastname}</td>";
                 echo "<td>{$email}</td>";
                 if ($image != "") {
-                    echo '<td><img src="uploads/' . ($image) . '"width="100"></td>';
+                    echo '<td><img src="' . ($image) . '"width="100"></td>';
                 } else {
                     echo '<td><img src="img/profile.jpeg" alt="image" width="100"></td>';
                 }
                 echo "<td>";
-                // read one record
-                echo "<a href='customer_read_one.php?id={$id}' class='btn btn-info me-3'>Read</a>";
 
                 // we will use this links on next part of this post
                 echo "<a href='customer_update.php?id={$id}' class='btn btn-primary me-3'>Edit</a>";

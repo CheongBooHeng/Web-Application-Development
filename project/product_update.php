@@ -164,7 +164,11 @@
                     $stmt->bindParam(':manufacture_date', $manufacture_date);
                     $stmt->bindParam(':expired_date', $expired_date);
                     $stmt->bindParam(':category_name', $category_name);
-                    $stmt->bindParam(':image', $image);
+                    if ($image == "") {
+                        $stmt->bindParam(":image", $row['image']);
+                    } else {
+                        $stmt->bindParam(':image', $target_file);
+                    }
                     // Execute the query
                     if ($stmt->execute()) {
                         echo "<div class='alert alert-success'>Record was updated.</div>";
@@ -202,6 +206,7 @@
                                 echo "</div>";
                             }
                         }
+                        header("Location: product_read_one.php?id={$id}");
                     } else {
                         echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
                     }
@@ -265,13 +270,13 @@
                     <td>
                         <?php
                         if ($image != "") {
-                            echo '<img src="uploads/' . htmlspecialchars($image, ENT_QUOTES) . '">';
+                            echo '<img src="' . htmlspecialchars($image, ENT_QUOTES) . '" width="100">';
                         } else {
-                            echo '<img src="img/comingsoon.jpg" alt="image">';
+                            echo '<img src="img/comingsoon.jpg" alt="image" width="100">';
                         }
                         ?>
                         <br>
-                        <input type="file" class="mt-2" name="image" class="form-control-file">
+                        <input type="file" class="mt-2" name="image" class="form-control-file" accept="image/*">
                     </td>
                 </tr>
 
