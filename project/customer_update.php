@@ -306,7 +306,7 @@
                 </tr>
                 <tr>
                     <td>Email</td>
-                    <td><input type='email' name='email' value="<?php echo htmlspecialchars($email, ENT_QUOTES);  ?>" class='form-control' /></td>
+                    <td><?php echo htmlspecialchars($email, ENT_QUOTES);  ?></td>
                 </tr>
                 <tr>
                     <td>Photo</td>
