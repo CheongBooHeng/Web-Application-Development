@@ -23,6 +23,11 @@
         // include database connection
         include 'config/database.php';
 
+        $customer_query = "SELECT id, username FROM customers";
+        $customer_stmt = $con->prepare($customer_query);
+        $customer_stmt->execute();
+        $customers = $customer_stmt->fetchAll(PDO::FETCH_ASSOC);
+
         $product_query = "SELECT * FROM products";
         $product_stmt = $con->prepare($product_query);
         $product_stmt->execute();
@@ -33,6 +38,12 @@
                 $customer = $_POST['customer'];
                 $product_id = $_POST['product'];
                 $quantity_array = $_POST['quantity'];
+
+                $status_query = "SELECT * FROM customers WHERE id=?";
+                $status_stmt = $con->prepare($status_query);
+                $status_stmt->bindParam(1, $customer);
+                $status_stmt->execute();
+                $status = $status_stmt->fetch(PDO::FETCH_ASSOC);
 
                 //array里面有一样的东西就会删掉
                 $noduplicate = array_unique($product_id);
@@ -53,6 +64,10 @@
 
                 if ($customer == "") {
                     $errors[] = "Please choose your username.";
+                }
+
+                if ($status['account_status'] == "Inactive") {
+                    $errors[] = "Inactive account can't make a order";
                 }
 
                 if (isset($selected_product_count)) {
@@ -121,14 +136,7 @@
             <select class="form-select mb-3" name="customer">
                 <option value=''>Select customer</option>";
                 <?php
-                // Fetch categories from the database
-                $query = "SELECT id, username FROM customers";
-                $stmt = $con->prepare($query);
-                $stmt->execute();
-                $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
                 // Generate select options
-
                 for ($x = 0; $x < count($customers); $x++) {
                     $customer_selected = isset($_POST["customer"]) && $customers[$x]['id'] == $_POST["customer"] ? "selected" : "";
                     echo "<option value='{$customers[$x]['id']}' $customer_selected>{$customers[$x]['username']}</option>";
