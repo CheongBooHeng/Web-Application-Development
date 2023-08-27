@@ -102,20 +102,20 @@
                     }
                     // make sure submitted file is not too large, can't be larger than 1 MB
                     if ($_FILES['image']['size'] > (524288)) {
-                        $errors []= "<div>Image must be less than 512 KB in size.</div>";
+                        $errors[] = "<div>Image must be less than 512 KB in size.</div>";
                     }
                     if ($check == false) {
                         // make sure that file is a real image
-                        $errors []= "<div>Submitted file is not an image.</div>";
+                        $errors[] = "<div>Submitted file is not an image.</div>";
                     }
                     // make sure certain file types are allowed
                     $allowed_file_types = array("jpg", "jpeg", "png", "gif");
                     if (!in_array($file_type, $allowed_file_types)) {
-                        $errors []= "<div>Only JPG, JPEG, PNG, GIF files are allowed.</div>";
+                        $errors[] = "<div>Only JPG, JPEG, PNG, GIF files are allowed.</div>";
                     }
                     // make sure file does not exist
                     if (file_exists($target_file)) {
-                        $errors []= "<div>Image already exists. Try to change file name.</div>";
+                        $errors[] = "<div>Image already exists. Try to change file name.</div>";
                     }
                 }
 
@@ -233,7 +233,11 @@
             }
             // show errors
             catch (PDOException $exception) {
-                die('ERROR: ' . $exception->getMessage());
+                if ($exception->getCode() == 23000) {
+                    echo '<div class= "alert alert-danger role=alert">' . 'Email has been taken. Please provide other email ' . '</div>';
+                } else {
+                    echo '<div class= "alert alert-danger role=alert">' . $exception->getMessage() . '</div>';
+                }
             }
         } ?>
 
@@ -304,9 +308,9 @@
                     <td>
                         <?php
                         if ($image != "") {
-                            echo '<img src="uploads/' . htmlspecialchars($image, ENT_QUOTES) . '">';
+                            echo '<img src="uploads/' . ($image) . '"width="100">';
                         } else {
-                            echo '<img src="img/profile.jpeg" alt="image">';
+                            echo '<img src="img/profile.jpeg" alt="image" width="100">';
                         }
                         ?>
                         <br>

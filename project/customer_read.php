@@ -43,7 +43,7 @@
         // select all data
         // ?前面是condition '' if else
         $searchKeyword = isset($_GET['search']) ? $_GET['search'] : '';
-        $query = "SELECT id, username, firstname, lastname, email FROM customers";
+        $query = "SELECT id, username, firstname, lastname, email, image FROM customers";
         if (!empty($searchKeyword)) {
             // $query 继续后面
             $query .= " WHERE username LIKE :keyword OR firstname LIKE :keyword OR lastname LIKE :keyword OR email LIKE :keyword";
@@ -76,6 +76,7 @@
             echo "<th>First Name</th>";
             echo "<th>Last Name</th>";
             echo "<th>Email</th>";
+            echo "<th>Image</th>";
             echo "<th>Action</th>";
             echo "</tr>";
 
@@ -92,6 +93,11 @@
                 echo "<td>{$firstname}</td>";
                 echo "<td>{$lastname}</td>";
                 echo "<td>{$email}</td>";
+                if ($image != "") {
+                    echo '<td><img src="uploads/' . ($image) . '"width="100"></td>';
+                } else {
+                    echo '<td><img src="img/profile.jpeg" alt="image" width="100"></td>';
+                }
                 echo "<td>";
                 // read one record
                 echo "<a href='customer_read_one.php?id={$id}' class='btn btn-info me-3'>Read</a>";

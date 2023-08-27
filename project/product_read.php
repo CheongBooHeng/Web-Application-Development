@@ -42,7 +42,7 @@
 
         // select all data
         $search = isset($_GET['search']) ? $_GET['search'] : '';
-        $query = "SELECT id, name, description, price, promotion_price, category_name FROM products";
+        $query = "SELECT id, name, description, price, promotion_price, category_name, image FROM products";
         if (!empty($search)) {
             $query .= " WHERE name LIKE :keyword";
             $search = "%{$search}%";
@@ -74,6 +74,7 @@
             echo "<th>Description</th>";
             echo "<th>Price</th>";
             echo "<th>Category</th>";
+            echo "<th>Image</th>";
             echo "<th>Action</th>";
             echo "</tr>";
 
@@ -99,6 +100,11 @@
                 }
                 echo "</td>";
                 echo "<td>{$category_name}</td>";
+                if ($image != "") {
+                    echo '<td><img src="uploads/' . htmlspecialchars($image, ENT_QUOTES) . '"width="100"></td>';
+                } else {
+                    echo '<td><img src="img/comingsoon.jpg" alt="image" width="100"></td>';
+                }
                 echo "<td>";
                 // read one record
                 echo "<a href='product_read_one.php?id={$id}' class='btn btn-info me-3'>Read</a>";

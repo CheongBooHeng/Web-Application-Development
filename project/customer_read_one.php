@@ -102,9 +102,9 @@
                 <td>Image</td>
                 <td><?php
                         if ($image != "") {
-                            echo '<img src="uploads/' . htmlspecialchars($image, ENT_QUOTES) . '">';
+                            echo '<img src="uploads/' . ($image) . '"width="100">';
                         } else {
-                            echo '<img src="img/profile.jpeg" alt="image">';
+                            echo '<img src="img/profile.jpeg" alt="image" width="100">';
                         }
                         ?></td>
             </tr>

@@ -184,7 +184,7 @@
             catch (PDOException $exception) {
                 //  die('ERROR: ' . $exception->getMessage());
                 if ($exception->getCode() == 23000) {
-                    echo '<div class= "alert alert-danger role=alert">' . 'Username has been taken' . '</div>';
+                    echo '<div class= "alert alert-danger role=alert">' . 'Username or email has been taken' . '</div>';
                 } else {
                     echo '<div class= "alert alert-danger role=alert">' . $exception->getMessage() . '</div>';
                 }
