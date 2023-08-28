@@ -61,6 +61,17 @@
         // check if form was submitted
         if ($_POST) {
             try {
+                if (isset($_POST['delete_image'])) {
+                    $empty = "";
+                    $delete_query = "UPDATE products
+                    SET image=:image  WHERE id = :id";
+                    $delete_stmt = $con->prepare($delete_query);
+                    $delete_stmt->bindParam(":image", $empty);
+                    $delete_stmt->bindParam(":id", $id);
+                    $delete_stmt->execute();
+                    unlink($image);
+                    header("Location: product_read_one.php?id={$id}");
+                }else{
                 // write update query
                 // in this case, it seemed like we have so many fields to pass and
                 // it is better to label them and not use question marks
@@ -212,6 +223,7 @@
                     }
                 }
             }
+        }
             // show errors
             catch (PDOException $exception) {
                 die('ERROR: ' . $exception->getMessage());
@@ -284,6 +296,9 @@
                     <td></td>
                     <td>
                         <input type='submit' value='Save Changes' class='btn btn-primary' />
+                        <?php if ($image != "") { ?>
+                            <input type="submit" value="Delete Image" class="btn btn-danger" name="delete_image">
+                        <?php } ?>
                         <a href='product_read.php' class='btn btn-danger'>Back to read products</a>
                     </td>
                 </tr>
