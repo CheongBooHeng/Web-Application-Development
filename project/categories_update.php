@@ -1,4 +1,4 @@
-<?php include "session.php"?>
+<?php include "session.php" ?>
 <!DOCTYPE HTML>
 <html>
 
@@ -65,6 +65,21 @@
                 // posted values
                 $category_name = htmlspecialchars(strip_tags($_POST['category_name']));
                 $description = htmlspecialchars(strip_tags($_POST['description']));
+
+                $errors = array();
+                if (empty($category_name)) {
+                    $errors[] = 'Category name is required.';
+                }
+                if (empty($description)) {
+                    $errors[] = 'Description is required.';
+                }
+                if (!empty($errors)) {
+                    echo "<div class='alert alert-danger'>";
+                    foreach ($errors as $error) {
+                        echo $error . "<br>";
+                    }
+                    echo "</div>";
+                }else{
                 // bind the parameters
                 $stmt->bindParam(':id', $id);
                 $stmt->bindParam(':category_name', $category_name);
@@ -76,6 +91,7 @@
                     echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
                 }
             }
+        }
             // show errors
             catch (PDOException $exception) {
                 die('ERROR: ' . $exception->getMessage());

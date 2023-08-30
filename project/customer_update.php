@@ -21,7 +21,6 @@
         // get passed parameter value, in this case, the record ID
         // isset() is a PHP function used to verify if a value is there or not
         $id = isset($_GET['id']) ? $_GET['id'] : die('ERROR: Record ID not found.');
-
         //include database connection
         include 'config/database.php';
 
@@ -65,13 +64,15 @@
             try {
                 if (isset($_POST['delete_image'])) {
                     $empty = "";
-                    $delete_query = "UPDATE customers SET image=:image WHERE customer_id = :id";
+                    $delete_query = "UPDATE customers SET image=:image WHERE id = :id";
                     $delete_stmt = $con->prepare($delete_query);
                     $delete_stmt->bindParam(":image", $empty);
                     $delete_stmt->bindParam(":id", $id);
                     $delete_stmt->execute();
                     unlink($image);
-                    header("Location: customer_read_one.php?id={$id}");
+                    echo "<script>
+                    window.location.href = 'customer_read_one.php?id={$id}&action=record_updated';
+                  </script>";
                 } else {
                 // write update query
                 // in this case, it seemed like we have so many fields to pass and
@@ -89,7 +90,7 @@
                 $gender = $_POST['gender'];
                 $date_of_birth = $_POST['date_of_birth'];
                 $account_status = $_POST['account_status'];
-                $email = htmlspecialchars(strip_tags($_POST['email']));
+                $email = $_POST['email'];
                 // new 'image' field
                 $image = !empty($_FILES["image"]["name"])
                     ? sha1_file($_FILES['image']['tmp_name']) . "-" . basename($_FILES["image"]["name"])
@@ -105,27 +106,28 @@
                 // now, if image is not empty, try to upload the image
                 if ($image) {
                     $check = getimagesize($_FILES["image"]["tmp_name"]);
-                    $image_width = $check[0];
-                    $image_height = $check[1];
-                    if ($image_width != $image_height) {
-                        $errors[] = "Only square size image allowed.";
-                    }
                     // make sure submitted file is not too large, can't be larger than 1 MB
                     if ($_FILES['image']['size'] > (524288)) {
-                        $errors[] = "<div>Image must be less than 512 KB in size.</div>";
+                        $errors[] = "Image must be less than 512 KB in size.";
                     }
                     if ($check == false) {
                         // make sure that file is a real image
-                        $errors[] = "<div>Submitted file is not an image.</div>";
+                        $errors[] = "Submitted file is not an image.";
                     }
                     // make sure certain file types are allowed
                     $allowed_file_types = array("jpg", "jpeg", "png", "gif");
                     if (!in_array($file_type, $allowed_file_types)) {
-                        $errors[] = "<div>Only JPG, JPEG, PNG, GIF files are allowed.</div>";
+                        $errors[] = "Only JPG, JPEG, PNG, GIF files are allowed.";
+                    }else{
+                        $image_width = $check[0];
+                        $image_height = $check[1];
+                        if ($image_width != $image_height) {
+                            $errors[] = "Only square size image allowed.";
+                        }
                     }
                     // make sure file does not exist
                     if (file_exists($target_file)) {
-                        $errors[] = "<div>Image already exists. Try to change file name.</div>";
+                        $errors[] = "Image already exists. Try to change file name.";
                     }
                 }
 
@@ -175,6 +177,22 @@
                     $errors[] = "Invalid Email format.";
                 }
 
+                if($date_of_birth >= date('Y-m-d')){
+                    $errors[] = "Date of birth cannot be the same as the current date or greater than the current date.";
+                }
+
+                if (empty($firstname)) {
+                    $errors[] = "First name is required";
+                } elseif (preg_match('/\d/', $firstname)) {
+                    $errors[] = 'First name cannot contain numbers';
+                }
+                
+                if (empty($lastname)) {
+                    $errors[] = "Last name is required";
+                } elseif (preg_match('/\d/', $lastname)) {
+                    $errors[] = 'Last name cannot contain numbers';
+                }                
+
                 if (!empty($errors)) {
                     echo "<div class='alert alert-danger'>";
                     foreach ($errors as $errorMessage) {
@@ -205,7 +223,9 @@
                     }
                     // Execute the query
                     if ($stmt->execute()) {
-                        echo "<div class='alert alert-success'>Record was updated.</div>";
+                        echo "<script>
+                        window.location.href = 'customer_read_one.php?id={$id}&action=record_updated';
+                      </script>";
                         // make sure the 'uploads' folder exists
                         // if not, create it
                         if ($image) {
@@ -225,8 +245,8 @@
                                     // it means photo was uploaded
                                 } else {
                                     echo "<div class='alert alert-danger'>";
-                                    echo "<div>Unable to upload photo.</div>";
-                                    echo "<div>Update the record to upload photo.</div>";
+                                    echo "Unable to upload photo.";
+                                    echo "Update the record to upload photo.";
                                     echo "</div>";
                                 }
                             }
@@ -235,12 +255,11 @@
                             else {
                                 // it means there are some errors, so show them to user
                                 echo "<div class='alert alert-danger'>";
-                                echo "<div>{$file_upload_error_messages}</div>";
-                                echo "<div>Update the record to upload photo.</div>";
+                                echo "{$file_upload_error_messages}";
+                                echo "Update the record to upload photo.";
                                 echo "</div>";
                             }
                         }
-                        header("Location: customer_read_one.php?id={$id}");
                     } else {
                         echo "<div class='alert alert-danger'>Unable to update record. Please try again.</div>";
                     }
@@ -317,7 +336,7 @@
                 </tr>
                 <tr>
                     <td>Email</td>
-                    <td><?php echo htmlspecialchars($email, ENT_QUOTES);  ?></td>
+                    <td><input type='email' name='email' value="<?php echo htmlspecialchars($email, ENT_QUOTES);  ?>" class='form-control' /></td>
                 </tr>
                 <tr>
                     <td>Photo</td>
@@ -330,7 +349,7 @@
                         }
                         ?>
                         <br>
-                        <input type="file" class="mt-2" name="image" class="form-control-file">
+                        <input type="file" class="mt-2" name="image" class="form-control-file" accept="image/*">
                     </td>
                 </tr>
                 <tr>

@@ -56,11 +56,6 @@ if (isset($_SESSION["customer_id"])) {
                                 exit();
                             } else {
                                 $error = "Inactive account.";
-                                echo "<div class='alert alert-danger'>";
-
-                                echo "<p class='error-message'>$error</p>";
-
-                                echo "</div>";
                             }
                         } else {
                             $error = "Incorrect password.";
@@ -91,10 +86,10 @@ if (isset($_SESSION["customer_id"])) {
                     <input type="password" class="form-control w-100" name="password" id="password">
                     <span class="text-danger"> <?php echo isset($password_input) ? $password_input : '';  ?></span>
                 </div>
+                <span class="text-danger"><?php echo isset($error) ? $error : ''; ?></span>
                 <div class="button">
                     <button class="btn btn-outline-success text-center w-100" type="submit">Log in</button>
                 </div>
-                <span class="text-danger"><?php echo isset($error) ? $error : ''; ?></span>
             </form>
         </div>
     </div>

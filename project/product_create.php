@@ -48,27 +48,28 @@
                     //pathinfo找是不是.jpg,.png
                     $file_type = pathinfo($target_file, PATHINFO_EXTENSION);
                     $check = getimagesize($_FILES["image"]["tmp_name"]);
-                    $image_width = $check[0];
-                    $image_height = $check[1];
-                    if ($image_width != $image_height) {
-                        $errors[] = "Only square size image allowed.";
-                    }
                     // make sure submitted file is not too large, can't be larger than 1 MB
                     if ($_FILES['image']['size'] > (524288)) {
-                        $errors []= "<div>Image must be less than 512 KB in size.</div>";
+                        $errors []= "Image must be less than 512 KB in size.";
                     }
                     if ($check == false) {
                         // make sure that file is a real image
-                        $errors []= "<div>Submitted file is not an image.</div>";
+                        $errors []= "Submitted file is not an image.";
                     }
                     // make sure certain file types are allowed
                     $allowed_file_types = array("jpg", "jpeg", "png", "gif");
                     if (!in_array($file_type, $allowed_file_types)) {
-                        $errors []= "<div>Only JPG, JPEG, PNG, GIF files are allowed.</div>";
+                        $errors []= "Only JPG, JPEG, PNG, GIF files are allowed.";
+                    }else{
+                        $image_width = $check[0];
+                        $image_height = $check[1];
+                        if ($image_width != $image_height) {
+                            $errors[] = "Only square size image allowed.";
+                        }
                     }
                     // make sure file does not exist
                     if (file_exists($target_file)) {
-                        $errors []= "<div>Image already exists. Try to change file name.</div>";
+                        $errors []= "Image already exists. Try to change file name.";
                     }
                 }
                 if (empty($name)) {
@@ -101,6 +102,9 @@
                     $errors[] = 'Manufacture date is required.';
                 } elseif ($expired <= $manufacture) {
                     $errors[] = 'Expired date must be later than manufacture date.';
+                }
+                if($manufacture > date('Y-m-d')){
+                    $errors[] = "Date of birth cannot be greater than the current date.";
                 }
 
                 if (!empty($errors)) {
@@ -220,7 +224,7 @@
                 </tr>
                 <tr>
                     <td>Photo</td>
-                    <td><input type="file" name="image" /></td>
+                    <td><input type="file" name="image" accept="image/*"/></td>
                 </tr>
                 <tr>
                     <td></td>

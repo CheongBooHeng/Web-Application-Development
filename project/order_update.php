@@ -1,4 +1,4 @@
-<?php include "session.php"?>
+<?php include "session.php" ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,11 +15,15 @@
         include 'navbar/nav.php';
         ?>
         <div class="page-header">
-            <h1>Update Customer</h1>
+            <h1>Update Order</h1>
         </div>
         <?php
         // isset() is a PHP function used to verify if a value is there or not
         $id = isset($_GET['id']) ? $_GET['id'] : die('ERROR: Record ID not found.');
+        $action = isset($_GET['action']) ? $_GET['action'] : "";
+        if ($action == 'record_updated') {
+            echo "<div class='alert alert-success'>Product record was updated.</div>";
+        }
 
         date_default_timezone_set('Asia/Kuala_Lumpur');
         //include database connection
@@ -30,7 +34,7 @@
         $customer_stmt->execute();
         $customers = $customer_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $product_query = "SELECT id, name FROM products";
+        $product_query = "SELECT id, name, price FROM products";
         $product_stmt = $con->prepare($product_query);
         $product_stmt->execute();
         $products = $product_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -56,18 +60,18 @@
             $noduplicate = array_unique($product_id);
 
             if (sizeof($noduplicate) != sizeof($product_id)) {
-                        //key  //val
+                //key  //val
                 //Array ( [0] => 1 [1] => 2 [2] => 3 )
                 foreach ($product_id as $key => $val) {
                     if (!array_key_exists($key, $noduplicate)) {
                         $errors[] = "Duplicated products have been chosen " . $products[$val - 1]['name'] . ".";
-                        unset($quantity[$key]);
+                        unset($quantity_array[$key]);
                     }
                 }
             }
             $product_id = array_values($noduplicate);
             $quantity_array = array_values($quantity_array);
-                                      //如果有duplicate就算                         //没有就跑这个
+            //如果有duplicate就算                         //没有就跑这个
             $selected_product_count = isset($noduplicate) ? count($noduplicate) : count($order_details);
 
             try {
@@ -106,7 +110,30 @@
                         $order_details_stmt->bindParam(":quantity", $quantity_array[$i]);
                         $order_details_stmt->execute();
                     }
-                    echo "<div class='alert alert-success' role='alert'>Order Placed Successfully.</div>";
+
+                    $total_amount = 0;
+                    for ($i = 0; $i < $selected_product_count; $i++) {
+                        $price_query = "SELECT * FROM products WHERE id=?";
+                        $price_stmt = $con->prepare($price_query);
+                        $price_stmt->bindParam(1, $product_id[$i]);
+                        $price_stmt->execute();
+                        $prices = $price_stmt->fetch(PDO::FETCH_ASSOC);
+
+                        $amount =  ($prices['promotion_price'] != 0) ?  $prices['promotion_price'] * $quantity_array[$i] : $prices['price'] * $quantity_array[$i];
+
+                        $total_amount += $amount;
+                    }
+
+                    $summary_query = "UPDATE order_summary SET total_amount=:total_amount, order_date=:order_date WHERE order_id=:order_id";
+                    $order_date = date('Y-m-d H:i:s'); // get the current date and time
+                    $summary_stmt = $con->prepare($summary_query);
+                    $summary_stmt->bindParam(":total_amount", $total_amount);
+                    $summary_stmt->bindParam(':order_date', $order_date);
+                    $summary_stmt->bindParam(":order_id", $id);
+                    $summary_stmt->execute();
+                    echo "<script>
+                    window.location.href = 'order_update.php?id={$id}&action=record_updated';
+                  </script>";
                     $_POST = array();
                 }
             } catch (PDOException $exception) {
@@ -115,7 +142,8 @@
         }
         ?>
         <form action="" method="post">
-            <input type="text" class="form-control mb-3" value="<?php echo $customers[$order_summaries['customer_id']]['username'] ?>">
+            <h5>Username : <?php echo $customers[$order_summaries['customer_id'] - 1]['username'] ?></h5>
+
             <table class="table table-hover table-responsive table-bordered" id="row_del">
                 <tr>
                     <th>#</th>
@@ -128,7 +156,7 @@
                 for ($x = 0; $x < $product_loop; $x++) {
                 ?>
                     <tr class="pRow">
-                        <td class="text-center"><?php echo $x+1?></td>
+                        <td class="text-center"><?php echo $x + 1 ?></td>
                         <td class="d-flex">
                             <select name="product[]" id="product" class="form-select" value>
                                 <option value="">Choose a Product</option>
