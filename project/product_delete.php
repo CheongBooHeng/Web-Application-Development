@@ -13,11 +13,6 @@ try {
     $exists_stmt->execute();
     $count = $exists_stmt->fetchColumn(); // Fetch the count directly
 
-    if ($count > 0) {
-        header("Location: product_read.php?action=failed");
-        exit; // Terminate the script
-    }
-
     // Fetch the image filename
     $image_query = "SELECT image FROM products WHERE id=?";
     $image_stmt = $con->prepare($image_query);
@@ -31,15 +26,24 @@ try {
     $delete_stmt->bindParam(1, $id);
 
     // Execute the delete query
-    if ($delete_stmt->execute()) {
-        unlink("uploads/" . $image['image']);
-        // Redirect to read records page and tell the user record was deleted
-        header('Location: product_read.php?action=deleted');
-        exit; // Terminate the script
+    if ($count > 0) {
+        header("Location: product_read.php?action=failed");
     } else {
-        die('Unable to delete record.');
+        if ($stmt->execute()) {
+            if ($image['image'] != "") {
+                if (file_exists($image['image'])) {
+                    unlink($image['image']);
+                }
+            }
+            // redirect to read records page and
+            // tell the user record was deleted
+            header('Location: product_read.php?action=deleted');
+        } else {
+            die('Unable to delete record.');
+        }
     }
-} catch (PDOException $exception) {
+}
+catch (PDOException $exception) {
     echo "<div class='alert alert-danger'>";
     echo $exception->getMessage();
     echo"</div>";
