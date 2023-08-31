@@ -3,7 +3,7 @@
 <html>
 
 <head>
-    <title>PDO - Read Customer - PHP CRUD Tutorial</title>
+    <title>Read customer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <!-- Latest compiled and minified Bootstrap CSS -->
 </head>
@@ -15,7 +15,7 @@
         include 'navbar/nav.php';
         ?>
         <div class="page-header">
-            <h1>Read Customers</h1>
+            <h1>Read Customer</h1>
         </div>
 
         <form class="d-flex" action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="GET">

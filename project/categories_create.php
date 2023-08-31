@@ -16,7 +16,7 @@
         include 'navbar/nav.php';
         ?>
         <div class="page-header">
-            <h1>Create new product categories</h1>
+            <h1>Create categories</h1>
         </div>
 
         <?php
